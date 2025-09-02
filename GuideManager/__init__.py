@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import os
 from pathlib import Path
 from typing import Any, Dict
 
@@ -27,17 +28,28 @@ class GuideManager:
         except FileNotFoundError as exc:
             raise GuideNotFoundError(path) from exc
 
+    def _base_dir(self) -> Path:
+        """Return the directory containing guideline files.
+
+        ``GUIDELINES_DIR`` can override the default location, allowing packaged
+        applications to use user-specific guideline paths.
+        """
+        env_dir = os.environ.get("GUIDELINES_DIR")
+        if env_dir:
+            return Path(env_dir)
+        return Path(__file__).resolve().parents[1] / "Guidelines"
+
     def get_format(self, method: str) -> Dict[str, Any]:
         """Return the guide dictionary for the given method."""
         if method not in self._cache:
-            base_dir = Path(__file__).resolve().parents[1] / "Guidelines"
+            base_dir = self._base_dir()
             guide_path = base_dir / f"{method}_Guide.json"
             self._cache[method] = self.load_guide(str(guide_path))
         return self._cache[method]
 
     def save_guide(self, method: str, data: Dict[str, Any]) -> None:
         """Persist ``data`` for ``method`` and update the cache."""
-        base_dir = Path(__file__).resolve().parents[1] / "Guidelines"
+        base_dir = self._base_dir()
         guide_path = base_dir / f"{method}_Guide.json"
         with open(guide_path, "w", encoding="utf-8") as file:
             json.dump(data, file, ensure_ascii=False, indent=2)
@@ -45,7 +57,7 @@ class GuideManager:
 
     def reset_guide(self, method: str) -> None:
         """Restore ``method`` guideline from the ``default`` directory."""
-        base_dir = Path(__file__).resolve().parents[1] / "Guidelines"
+        base_dir = self._base_dir()
         default_dir = base_dir / "default"
         src = default_dir / f"{method}_Guide.json"
         dst = base_dir / f"{method}_Guide.json"
