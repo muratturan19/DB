@@ -21,6 +21,7 @@ from Review import Review
 from ReportGenerator import ReportGenerator
 from ComplaintSearch import ComplaintStore, ExcelClaimsSearcher, normalize_text
 from EightDScanner import EightDScanner
+from PromptManager import PromptManager
 
 REPORT_DIR = Path(__file__).resolve().parents[1] / "reports"
 REPORT_DIR.mkdir(parents=True, exist_ok=True)
@@ -55,6 +56,7 @@ ALIAS_TO_HEADER = {
 
 # Shared component instances
 _guide_manager = GuideManager()
+_prompt_manager = PromptManager()
 analyzer = LLMAnalyzer()
 reviewer = Review()
 reporter = ReportGenerator(_guide_manager)
@@ -214,6 +216,24 @@ def guide(method: str, request: Request) -> Dict[str, Any]:
     return result
 
 
+class GuideUpdateBody(BaseModel):
+    data: Dict[str, Any]
+
+
+@app.post("/guide/{method}")
+def update_guide(method: str, body: GuideUpdateBody) -> Dict[str, str]:
+    """Update guideline content for ``method``."""
+    _guide_manager.save_guide(method, body.data)
+    return {"status": "ok"}
+
+
+@app.post("/guide/{method}/reset")
+def reset_guide(method: str) -> Dict[str, str]:
+    """Reset guideline to default for ``method``."""
+    _guide_manager.reset_guide(method)
+    return {"status": "ok"}
+
+
 @app.post("/scan_8d")
 def scan_8d() -> Dict[str, Any]:
     """Scan 8D Excel reports and store rows in SQLite."""
@@ -226,6 +246,30 @@ def scan_8d() -> Dict[str, Any]:
     result = {"status": "ok", "count": count}
     logger.info("Scan result: %s", result)
     return result
+
+
+class PromptBody(BaseModel):
+    text: str
+
+
+@app.get("/prompt/{method}")
+def get_prompt(method: str) -> Dict[str, str]:
+    """Return text prompt for ``method``."""
+    return {"text": _prompt_manager.get_text_prompt(method)}
+
+
+@app.post("/prompt/{method}")
+def save_prompt(method: str, body: PromptBody) -> Dict[str, str]:
+    """Persist prompt text for ``method``."""
+    _prompt_manager.save_text_prompt(method, body.text)
+    return {"status": "ok"}
+
+
+@app.post("/prompt/{method}/reset")
+def reset_prompt(method: str) -> Dict[str, str]:
+    """Reset text prompt to default for ``method``."""
+    _prompt_manager.reset_text_prompt(method)
+    return {"status": "ok"}
 
 
 __all__ = ["app", "scan_8d"]

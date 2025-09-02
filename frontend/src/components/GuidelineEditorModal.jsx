@@ -1,0 +1,54 @@
+import React, { useEffect, useState } from 'react'
+import { Modal, Box, Typography, IconButton, TextField, Button } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
+
+function GuidelineEditorModal({ open, onClose, method = '8D' }) {
+  const [content, setContent] = useState('')
+
+  useEffect(() => {
+    if (open) {
+      fetch(`/guide/${method}`)
+        .then((res) => res.json())
+        .then((data) => setContent(JSON.stringify(data, null, 2)))
+    }
+  }, [open, method])
+
+  const handleSave = () => {
+    fetch(`/guide/${method}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: JSON.parse(content) })
+    }).then(onClose)
+  }
+
+  const handleReset = () => {
+    fetch(`/guide/${method}/reset`, { method: 'POST' })
+      .then(() => fetch(`/guide/${method}`))
+      .then((res) => res.json())
+      .then((data) => setContent(JSON.stringify(data, null, 2)))
+  }
+
+  return (
+    <Modal open={open} onClose={onClose} aria-labelledby="guideline-editor-title">
+      <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', boxShadow: 24, p: 3, borderRadius: 2, width: '80%', maxWidth: 700 }}>
+        <IconButton aria-label="close" onClick={onClose} sx={{ position: 'absolute', top: 8, right: 8 }}>
+          <CloseIcon />
+        </IconButton>
+        <Typography id="guideline-editor-title" variant="h6" sx={{ mb: 2 }}>
+          {method} Guideline
+        </Typography>
+        <TextField multiline fullWidth minRows={12} value={content} onChange={(e) => setContent(e.target.value)} sx={{ mb: 2 }} />
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Button onClick={handleReset} color="secondary" sx={{ mr: 1 }}>
+            Reset
+          </Button>
+          <Button onClick={handleSave} variant="contained">
+            Save
+          </Button>
+        </Box>
+      </Box>
+    </Modal>
+  )
+}
+
+export default GuidelineEditorModal

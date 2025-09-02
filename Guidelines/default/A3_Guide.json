@@ -1,0 +1,84 @@
+{
+  "method": "A3 Problem Solving",
+  "description": "A3 Problem Solving, problemi sistematik biçimde tanımlamak, analiz etmek ve çözüm geliştirmek için kullanılan yalın düşünce temelli bir yaklaşımdır. A3 formatında tek sayfalık bir raporla ilerlenir.",
+  "fields": [
+    {
+      "id": "Background",
+      "title": "Arka Plan (Background)",
+      "definition": "Problemin bağlamını, tarihçesini ve neden ele alındığını açıklayın.",
+      "example_questions": [
+        "Bu konu neden önemli?",
+        "Bu problem nerede, ne zaman ve kim tarafından fark edildi?",
+        "Şu anki durum neden sürdürülemez?"
+      ]
+    },
+    {
+      "id": "CurrentSituation",
+      "title": "Mevcut Durum (Current Situation)",
+      "definition": "Süreç haritası, veri ve gözlemlerle mevcut durumu açıkça tanımlayın.",
+      "example_questions": [
+        "Şu anda neler oluyor?",
+        "Performans ölçümleri ne gösteriyor?",
+        "İlgili süreç adımları neler?"
+      ]
+    },
+    {
+      "id": "ProblemStatement",
+      "title": "Problem Tanımı (Problem Statement)",
+      "definition": "Belirli, ölçülebilir ve zaman odaklı bir problem tanımı oluşturun.",
+      "example_questions": [
+        "Problem nedir ve neden acildir?",
+        "Problem ifadesi müşteri odaklı mı?",
+        "Hedef ve mevcut durum arasında ne fark var?"
+      ]
+    },
+    {
+      "id": "Goal",
+      "title": "Hedef (Goal)",
+      "definition": "Başarının nasıl tanımlanacağını belirleyin.",
+      "example_questions": [
+        "Problem çözüldüğünde nasıl bir sonuç bekleniyor?",
+        "Zaman çizelgesi ve hedef değer nedir?"
+      ]
+    },
+    {
+      "id": "RootCauseAnalysis",
+      "title": "Kök Neden Analizi (Root Cause Analysis)",
+      "definition": "Probleme neden olan temel sebepleri araştırın.",
+      "example_questions": [
+        "5N neden sorusu kullanıldı mı?",
+        "Ishikawa/Fishbone diyagramı oluşturuldu mu?",
+        "Kök neden veriye dayanıyor mu?"
+      ]
+    },
+    {
+      "id": "Countermeasures",
+      "title": "Karşı Önlemler (Countermeasures)",
+      "definition": "Kök nedenleri ortadan kaldıracak çözüm önerilerini tanımlayın.",
+      "example_questions": [
+        "Önerilen önlemler doğrudan kök nedenlere mi hitap ediyor?",
+        "Alternatif çözümler değerlendirildi mi?",
+        "Etki ve uygulanabilirlik analizleri yapıldı mı?"
+      ]
+    },
+    {
+      "id": "ImplementationPlan",
+      "title": "Uygulama Planı (Implementation Plan)",
+      "definition": "Çözüm önerilerinin kim tarafından, ne zaman, nasıl uygulanacağını belirtin.",
+      "example_questions": [
+        "Görev dağılımı yapıldı mı?",
+        "Uygulama süresi, kaynaklar ve sorumlular belirlendi mi?"
+      ]
+    },
+    {
+      "id": "FollowUp",
+      "title": "Takip & Doğrulama (Follow-Up)",
+      "definition": "Sonuçlar izlenir, iyileştirme kalıcı hale getirilir.",
+      "example_questions": [
+        "Uygulamalar sonrası performans izlendi mi?",
+        "Standartlar güncellendi mi?",
+        "Yeni öğrenimler paylaşıldı mı?"
+      ]
+    }
+  ]
+}

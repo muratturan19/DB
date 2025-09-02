@@ -38,6 +38,23 @@ class PromptManagerTextTest(unittest.TestCase):
             self.assertEqual(m.call_count, 1)
             self.assertIs(first, second)
 
+    def test_save_and_reset_text_prompt(self) -> None:
+        target = self.base_dir / "A3_Prompt.txt"
+        backup = target.with_suffix(".bak")
+        target.rename(backup)
+        try:
+            self.manager.save_text_prompt("A3", "test")
+            self.assertEqual(self.manager.get_text_prompt("A3"), "test")
+            self.manager.reset_text_prompt("A3")
+            with open(target, "r", encoding="utf-8") as f:
+                restored = f.read()
+            default_path = self.base_dir / "default" / "A3_Prompt.txt"
+            with open(default_path, "r", encoding="utf-8") as f:
+                default = f.read()
+            self.assertEqual(restored, default)
+        finally:
+            backup.rename(target)
+
 
 if __name__ == "__main__":
     unittest.main()

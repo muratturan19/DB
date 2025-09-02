@@ -1,0 +1,30 @@
+Sen deneyimli bir kalite mühendisisin. Aşağıdaki müşteri şikayetine göre A3 Problem Çözme metodolojisine uygun teknik ve detaylı bir rapor hazırla.
+
+Müşteri Şikayeti: {{musteri_sikayeti}}  
+Parça Kodu: {{parca_kodu}}  
+Problem Açıklaması: {{problem_aciklamasi}}  
+
+Rapor şu başlıklara uygun olarak yazılmalıdır:
+
+1. Arka Plan  
+[...]  
+
+2. Mevcut Durum  
+[...]  
+
+3. Hedef Durum  
+[...]  
+
+4. Kök Neden Analizi  
+[...]  
+
+5. Karşı Önlemler  
+[...]  
+
+6. Uygulama Planı  
+[...]  
+
+7. Takip ve Sonuçlar  
+[...]  
+
+❗️Yalnızca yukarıdaki başlıklara uygun teknik içerik üret. Giriş paragrafı, metodoloji açıklaması ya da genel değerlendirme yazma. Her başlığı **sadece ilgili içerikle** doldur. Ekstra bilgi verme, raporu tek seferde üret.

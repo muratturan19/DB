@@ -1,0 +1,66 @@
+{
+  "method": "Ishikawa (Balık Kılçığı) Diyagramı",
+  "description": "Problemin kök nedenlerini sistematik bir şekilde analiz etmek için kullanılan neden-sonuç diyagramıdır. Ana kategoriler altında olası tüm nedenler sorgulanır.",
+  "fields": [
+    {
+      "id": "Man",
+      "title": "İnsan (Man)",
+      "definition": "Problemin oluşmasında etkili olabilecek insan hataları veya yetkinlik eksiklikleri.",
+      "example_questions": [
+        "Çalışanlar doğru şekilde eğitilmiş miydi?",
+        "Görevler net ve anlaşılır mıydı?",
+        "İnsan faktörü süreci nasıl etkiledi?"
+      ]
+    },
+    {
+      "id": "Machine",
+      "title": "Makine (Machine)",
+      "definition": "Kullanılan ekipman, araç veya makinelerin problemin nedeni olup olmadığını değerlendirin.",
+      "example_questions": [
+        "Makine veya ekipman arızalı mıydı?",
+        "Bakım geçmişi düzenli miydi?",
+        "Kullanılan teknolojide bir sınır ya da kusur var mı?"
+      ]
+    },
+    {
+      "id": "Method",
+      "title": "Yöntem (Method)",
+      "definition": "Uygulanan prosedürler, talimatlar ve yöntemlerin problemin nedeni olup olmadığını analiz edin.",
+      "example_questions": [
+        "İş talimatları net miydi?",
+        "Standart işletim prosedürleri uygun muydu?",
+        "İzlenen yöntem soruna katkıda bulunmuş olabilir mi?"
+      ]
+    },
+    {
+      "id": "Material",
+      "title": "Malzeme (Material)",
+      "definition": "Kullanılan hammadde, yarı mamul veya son ürünle ilgili kalite sorunlarını araştırın.",
+      "example_questions": [
+        "Malzeme spesifikasyonlara uygun muydu?",
+        "Kalitesiz ya da hatalı malzeme kullanılmış olabilir mi?",
+        "Tedarik zincirinden gelen sorun var mı?"
+      ]
+    },
+    {
+      "id": "Measurement",
+      "title": "Ölçüm (Measurement)",
+      "definition": "Kalite kontrol, ölçüm ekipmanları ve veri toplama yöntemlerinin doğruluğunu sorgulayın.",
+      "example_questions": [
+        "Ölçüm araçları kalibre edilmiş miydi?",
+        "Doğru veri toplandı mı?",
+        "Analiz hatası olasılığı var mı?"
+      ]
+    },
+    {
+      "id": "Environment",
+      "title": "Çevre (Environment)",
+      "definition": "Fiziksel çevre koşulları (ısı, nem, gürültü, ışık) veya iş ortamının problemi nasıl etkilediğini değerlendirin.",
+      "example_questions": [
+        "Çalışma ortamı uygun muydu?",
+        "Dış etkenler (mevsim, toz, nem) süreci etkiliyor olabilir mi?",
+        "İklimsel veya bölgesel koşullar göz önüne alındı mı?"
+      ]
+    }
+  ]
+}

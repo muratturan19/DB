@@ -3,7 +3,7 @@ from pathlib import Path
 import unittest
 import unittest.mock
 
-from GuideManager import DEFAULT_8D_GUIDE, GuideManager, GuideNotFoundError
+from GuideManager import GuideManager, GuideNotFoundError
 
 
 class GuideManagerTest(unittest.TestCase):
@@ -44,25 +44,32 @@ class GuideManagerTest(unittest.TestCase):
             self.assertEqual(mocked_open.call_count, 1)
             self.assertIs(first, second)
 
-    def test_get_format_fallback_default_8d(self) -> None:
-        """Return the default guide when the file is missing."""
+    def test_reset_guide_restores_default(self) -> None:
+        """``reset_guide`` should copy the default guide back."""
         target = self.base_dir / "8D_Guide.json"
-        backup = target.with_suffix(".json.bak")
+        backup = target.with_suffix(".bak")
         target.rename(backup)
         try:
-            result = self.manager.get_format("8D")
-            self.assertEqual(result, DEFAULT_8D_GUIDE)
+            with open(target, "w", encoding="utf-8") as f:
+                json.dump({"method": "8D", "steps": []}, f)
+            self.manager.reset_guide("8D")
+            with open(target, "r", encoding="utf-8") as f:
+                restored = json.load(f)
+            default_path = self.base_dir / "default" / "8D_Guide.json"
+            with open(default_path, "r", encoding="utf-8") as f:
+                default = json.load(f)
+            self.assertEqual(restored, default)
         finally:
             backup.rename(target)
 
     def test_load_guide_missing_file_raises(self) -> None:
-        """``load_guide`` should raise ``GuideNotFoundError`` when the path is invalid."""
+        """``load_guide`` raises ``GuideNotFoundError`` for invalid paths."""
         missing = self.base_dir / "missing.json"
         with self.assertRaises(GuideNotFoundError):
             self.manager.load_guide(str(missing))
 
     def test_get_format_missing_file_raises(self) -> None:
-        """Unknown methods or removed guides should raise ``GuideNotFoundError``."""
+        """Missing guides should raise ``GuideNotFoundError``."""
         target = self.base_dir / "DMAIC_Guide.json"
         backup = target.with_suffix(".json.bak")
         target.rename(backup)
