@@ -127,6 +127,12 @@ veriyi kullanir. Diger rehber dosyalari gomulu olmadigindan yerinde kalmalidir;
 ornegin `Guidelines/A3_Guide.json` dosyasi yoksa ayni fonksiyon
 `GuideNotFoundError` hatasi verir.
 
+Rehber dosyalari artik duzenlenebilir hale gelmistir. `Guidelines/default`
+klasoru varsayilan sablonlari saklar ve `POST /guide/{metot}/reset` ucu ya da
+arayuzdeki kitap simgesi ile acilan duzenleyici uzerinden bu sablonlar geri
+yuklenebilir. Yeni icerik `GuideManager.save_guide` fonksiyonuyla veya
+`POST /guide/{metot}` cagrisiyla kaydedilebilir.
+
 ## Prompts Klasoru
 
 `Prompts/` klasorunde her rapor metodu icin hazirlanmis duz metin sablonlari
@@ -148,6 +154,11 @@ adinizla yeni bir `*_Prompt.txt` dosyasi ekleyip `PromptManager.get_text_prompt`
 fonksiyonuna bu adi verebilirsiniz. Yer tutuculari korudugunuz surece metin
 icerigini serbestce degistirerek rapor formatini ihtiyaciniza gore ozellestire
 bilirsiniz.
+
+Varsayilan sablonlar `Prompts/default/` altinda saklanir. Arayuzdeki not
+simgesiyle acilan duzenleyici veya `POST /prompt/{metot}` ucu kullanilarak
+metinler guncellenebilir. `POST /prompt/{metot}/reset` cagrisiyla dosya
+icerigi varsayilan haline dondurulur.
 
 ## Kullanici Girdisi Akisi
 
@@ -201,7 +212,13 @@ asagidaki uclari sunar:
 - `GET /complaints` – `ComplaintStore` ve `ExcelClaimsSearcher` sorgulari
 - `POST /complaints` – yeni sikayet ekler
 - `GET /guide/{method}` – secili metodun rehber adimlarini dondurur
-- `GET /options/{field}` – Excel'deki benzersiz degerlerini dondurur ve dropdown menulerde kullanilir
+- `POST /guide/{method}` – rehber icerigini gunceller
+- `POST /guide/{method}/reset` – rehberi varsayilan sablona dondurur
+- `GET /prompt/{method}` – metin promptunu dondurur
+- `POST /prompt/{method}` – metin promptunu kaydeder
+- `POST /prompt/{method}/reset` – promptu varsayilan sablona dondurur
+- `GET /options/{field}` – Excel'deki benzersiz degerlerini dondurur ve
+  dropdown menulerde kullanilir
 
 Ornek kullanim:
 
@@ -374,6 +391,11 @@ degerini buna gore degistirin.
   degerini guncelleyin.
 - Yanlis ya da eksik bir API URL'si, arayuzun API'den veri cekip
   gostermesini engeller.
+
+Baslik cubugunda yer alan kitap ve not simgeleri sirayla rehber ve prompt
+duzenleyicilerini acar. Kaydet butonu degisiklikleri ilgili dosyalara yazar,
+"Reset" secenegi ise `Guidelines/default` veya `Prompts/default` klasorlerindeki
+varsayilan sablonlari geri yukler.
 
 ## Masaüstü Uygulama (Electron)
 
