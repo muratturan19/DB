@@ -1,61 +1,86 @@
-const { app, BrowserWindow } = require('electron');
-const { spawn, spawnSync } = require('child_process');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
+const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-const dotenv = require('dotenv');
 
-let pythonProcess;
+const appDataRoot = path.join(app.getPath('appData'), 'DB-App');
+const envPath = path.join(appDataRoot, '.env');
+const userGuidelines = path.join(appDataRoot, 'guidelines');
+const userPrompts = path.join(appDataRoot, 'prompts');
 
-function ensureEnv() {
-    const envPath = path.join(__dirname, '..', '.env');
-    let config = {};
-    if (fs.existsSync(envPath)) {
-        config = dotenv.parse(fs.readFileSync(envPath));
-    }
-    if (!config.OPENAI_API_KEY || !config.CLAIMS_FILE_PATH || !config.OPENAI_MODEL) {
-        const script = path.join(__dirname, '..', 'configure_env.py');
-        spawnSync('python', [script], { stdio: 'inherit' });
-    }
+function ensureDir(dir) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+}
+
+function copyDefaultsIfNeeded(src, dest) {
+  ensureDir(dest);
+  if (fs.readdirSync(dest).length === 0) {
+    fs.cpSync(src, dest, { recursive: true });
+  }
 }
 
 function createWindow() {
-    const mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
-        show: false,
-    });
+  const mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+    },
+  });
 
-    const indexPath = path.join(__dirname, '..', 'frontend', 'dist', 'index.html');
-    mainWindow.loadFile(indexPath);
-    mainWindow.once('ready-to-show', () => {
-        mainWindow.show();
-    });
+  const indexPath = path.join(process.resourcesPath, 'ui', 'index.html');
+  mainWindow.loadFile(indexPath);
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+  });
 }
 
+let backendProcess;
+
 app.whenReady().then(() => {
-    ensureEnv();
-    const exeName = process.platform === 'win32' ? 'run_api.exe' : 'run_api';
-    const exePath = path.join(__dirname, 'backend', exeName);
-    pythonProcess = spawn(exePath, [], {
-        stdio: 'ignore',
-        detached: true,
-    });
-    pythonProcess.unref();
+  const guidelinesDefault = path.join(process.resourcesPath, 'guidelines-default');
+  const promptsDefault = path.join(process.resourcesPath, 'prompts-default');
 
-    createWindow();
+  copyDefaultsIfNeeded(guidelinesDefault, userGuidelines);
+  copyDefaultsIfNeeded(promptsDefault, userPrompts);
 
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) {
-            createWindow();
-        }
-    });
+  const backendExe = path.join(process.resourcesPath, 'backend', 'backend.exe');
+  backendProcess = spawn(backendExe, [], {
+    env: { ...process.env, ENV_FILE: envPath },
+    windowsHide: true,
+  });
+
+  ipcMain.handle('guidelines:open', () => shell.openPath(userGuidelines));
+  ipcMain.handle('guidelines:reset', () => {
+    fs.rmSync(userGuidelines, { recursive: true, force: true });
+    fs.cpSync(guidelinesDefault, userGuidelines, { recursive: true });
+  });
+  ipcMain.handle('prompts:open', () => shell.openPath(userPrompts));
+  ipcMain.handle('prompts:reset', () => {
+    fs.rmSync(userPrompts, { recursive: true, force: true });
+    fs.cpSync(promptsDefault, userPrompts, { recursive: true });
+  });
+  ipcMain.handle('config:open', () => shell.openPath(appDataRoot));
+
+  createWindow();
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
 });
 
 app.on('window-all-closed', () => {
-    if (pythonProcess) {
-        pythonProcess.kill();
-    }
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
+  if (backendProcess) {
+    backendProcess.kill();
+  }
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
+

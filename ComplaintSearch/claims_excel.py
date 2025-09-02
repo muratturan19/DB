@@ -26,13 +26,13 @@ class ExcelClaimsSearcher:
     def __init__(self, path: str | Path | None = None) -> None:
         """Initialize with optional Excel file ``path``.
 
-        When ``path`` is ``None``, ``CLAIMS_FILE_PATH`` is read from the
+        When ``path`` is ``None``, ``COMPLAINTS_XLSX_PATH`` is read from the
         ``.env`` file. If the variable is unset, the bundled
         ``F160_Customer_Claims.xlsx`` inside the ``CC`` package is used.
         """
         if path is None:
             load_dotenv()
-            path = os.getenv("CLAIMS_FILE_PATH")
+            path = os.getenv("COMPLAINTS_XLSX_PATH")
             if path is None:
                 path = resources.files("CC").joinpath(
                     "F160_Customer_Claims.xlsx"

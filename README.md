@@ -73,8 +73,8 @@ sorarak `.env` dosyasina yazar. Varsayilan ornek dosya
 python configure_env.py
 ```
 
-Bu islemin ardindan `CLAIMS_FILE_PATH` degiskeni de `.env` dosyaniza eklenmis
-olur ve uygulama muster sikayetlerini bu dosyadan okur.
+Bu islemin ardindan `COMPLAINTS_XLSX_PATH` degiskeni de `.env` dosyaniza
+eklenmis olur ve uygulama muster sikayetlerini bu dosyadan okur.
 
 Dosya mevcut degilse `ExcelClaimsSearcher.search` bos liste dondurur ve loglara
 bir uyari mesaji yazar.

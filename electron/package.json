@@ -4,9 +4,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build:backend": "pyinstaller --onefile --distpath backend ../run_api.py",
-    "dist": "npm run build:backend && electron-builder",
-    "postinstall": "npm run build:backend"
+    "prep": "rm -rf ui && mkdir -p ui && cp -r ../frontend/dist/* ui/ && mkdir -p bundles/backend && cp ../bundles/backend/backend.exe bundles/backend/backend.exe",
+    "dist": "electron-builder -w"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
@@ -16,21 +15,22 @@
     "electron-builder": "^24.6.0"
   },
   "build": {
+    "asar": true,
     "files": [
-      "main.js"
+      "main.js",
+      "preload.js",
+      "ui/**"
     ],
     "extraResources": [
-      {
-        "from": "../frontend/dist",
-        "to": "frontend"
-      },
-      {
-        "from": "backend",
-        "to": "backend"
-      }
+      { "from": "bundles/backend/backend.exe", "to": "backend/backend.exe" },
+      { "from": "../Guidelines/default", "to": "guidelines-default" },
+      { "from": "../Prompts/default", "to": "prompts-default" }
     ],
-    "win": {
-      "target": "nsis"
+    "win": { "target": "nsis" },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "include": "build/installer.nsh"
     }
   }
 }
