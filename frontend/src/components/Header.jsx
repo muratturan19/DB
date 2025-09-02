@@ -9,7 +9,6 @@ import Brightness4Icon from '@mui/icons-material/Brightness4'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import SettingsIcon from '@mui/icons-material/Settings'
-import logo from '/logo.png'
 
 function Header({ toggleColorMode, mode }) {
   const theme = useTheme()
@@ -26,7 +25,7 @@ function Header({ toggleColorMode, mode }) {
       }}
     >
       <Toolbar sx={{ minHeight: { xs: 64, sm: 80 } }}>
-        <Box component="img" src={logo} alt="Company Logo" sx={{ height: isMobile ? 40 : 50, mr: 2 }} />
+        <Box component="img" src="/fkt.png" alt="Company Logo" sx={{ height: isMobile ? 40 : 50, mr: 2 }} />
         <Typography
           variant={isMobile ? 'h6' : 'h5'}
           sx={{
