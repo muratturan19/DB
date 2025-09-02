@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import { Modal, Box, Typography, IconButton, TextField, Button } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
+import { API_BASE } from '../api'
 
 function GuidelineEditorModal({ open, onClose, method = '8D' }) {
   const [content, setContent] = useState('')
 
   useEffect(() => {
     if (open) {
-      fetch(`/guide/${method}`)
+      fetch(`${API_BASE}/guide/${method}`)
         .then((res) => res.json())
         .then((data) => setContent(JSON.stringify(data, null, 2)))
     }
   }, [open, method])
 
   const handleSave = () => {
-    fetch(`/guide/${method}`, {
+    fetch(`${API_BASE}/guide/${method}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data: JSON.parse(content) })
@@ -22,8 +23,8 @@ function GuidelineEditorModal({ open, onClose, method = '8D' }) {
   }
 
   const handleReset = () => {
-    fetch(`/guide/${method}/reset`, { method: 'POST' })
-      .then(() => fetch(`/guide/${method}`))
+    fetch(`${API_BASE}/guide/${method}/reset`, { method: 'POST' })
+      .then(() => fetch(`${API_BASE}/guide/${method}`))
       .then((res) => res.json())
       .then((data) => setContent(JSON.stringify(data, null, 2)))
   }
