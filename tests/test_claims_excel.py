@@ -116,18 +116,18 @@ class ExcelClaimsSearchTest(unittest.TestCase):
             self.assertEqual(customers, ["ACME", "BETA"])
 
     def test_env_default_path(self) -> None:
-        """File path should come from ``CLAIMS_FILE_PATH`` when not provided."""
+        """File path should come from ``COMPLAINTS_XLSX_PATH`` when not provided."""
         with tempfile.TemporaryDirectory() as tmpdir:
             file_path = os.path.join(tmpdir, "claims.xlsx")
             self._create_file(file_path)
-            with patch.dict("os.environ", {"CLAIMS_FILE_PATH": file_path}):
+            with patch.dict("os.environ", {"COMPLAINTS_XLSX_PATH": file_path}):
                 searcher = ExcelClaimsSearcher()
                 result = searcher.search({"customer": "ACME"}, year=2023)
                 self.assertEqual(len(result), 1)
 
     def test_load_dotenv_called(self) -> None:
         """``load_dotenv`` should be invoked when ``path`` is ``None``."""
-        with patch.dict("os.environ", {"CLAIMS_FILE_PATH": "f"}):
+        with patch.dict("os.environ", {"COMPLAINTS_XLSX_PATH": "f"}):
             with patch.object(claims_excel, "load_dotenv") as mock_load:
                 searcher = ExcelClaimsSearcher()
                 self.assertTrue(mock_load.called)

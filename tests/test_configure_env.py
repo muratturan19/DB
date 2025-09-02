@@ -22,7 +22,7 @@ class ConfigureEnvTest(unittest.TestCase):
                     data = dotenv_values(env_path)
             self.assertEqual(data.get("OPENAI_MODEL"), "gpt-4o-mini")
             self.assertEqual(data.get("OPENAI_API_KEY"), "k")
-            self.assertEqual(data.get("CLAIMS_FILE_PATH"), "c.xlsx")
+            self.assertEqual(data.get("COMPLAINTS_XLSX_PATH"), "c.xlsx")
 
 
 if __name__ == "__main__":
