@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import os
 from pathlib import Path
 from typing import Any, Dict
 
@@ -26,10 +27,21 @@ class PromptManager:
         with open(path, "r", encoding="utf-8") as file:
             return file.read()
 
+    def _base_dir(self) -> Path:
+        """Return the directory containing prompt files.
+
+        ``PROMPTS_DIR`` can override the default location, enabling packaged
+        applications to read user-supplied prompts.
+        """
+        env_dir = os.environ.get("PROMPTS_DIR")
+        if env_dir:
+            return Path(env_dir)
+        return Path(__file__).resolve().parents[1] / "Prompts"
+
     def get_template(self, method: str) -> Dict[str, Any]:
         """Return the prompt template for ``method`` with caching."""
         if method not in self._cache:
-            base_dir = Path(__file__).resolve().parents[1] / "Prompts"
+            base_dir = self._base_dir()
             prompt_path = base_dir / f"{method}_Prompt.json"
             self._cache[method] = self.load_prompt(str(prompt_path))
         return self._cache[method]
@@ -37,7 +49,7 @@ class PromptManager:
     def get_text_prompt(self, method: str) -> str:
         """Return the text prompt for ``method`` with caching."""
         if method not in self._text_cache:
-            base_dir = Path(__file__).resolve().parents[1] / "Prompts"
+            base_dir = self._base_dir()
             prompt_path = base_dir / f"{method}_Prompt.txt"
             if prompt_path.exists():
                 path_str = str(prompt_path)
@@ -48,7 +60,7 @@ class PromptManager:
 
     def save_text_prompt(self, method: str, text: str) -> None:
         """Persist ``text`` for ``method`` and update the cache."""
-        base_dir = Path(__file__).resolve().parents[1] / "Prompts"
+        base_dir = self._base_dir()
         prompt_path = base_dir / f"{method}_Prompt.txt"
         with open(prompt_path, "w", encoding="utf-8") as file:
             file.write(text)
@@ -56,7 +68,7 @@ class PromptManager:
 
     def reset_text_prompt(self, method: str) -> None:
         """Restore ``method`` prompt from the ``default`` directory."""
-        base_dir = Path(__file__).resolve().parents[1] / "Prompts"
+        base_dir = self._base_dir()
         default_dir = base_dir / "default"
         src = default_dir / f"{method}_Prompt.txt"
         dst = base_dir / f"{method}_Prompt.txt"

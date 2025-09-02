@@ -1,4 +1,6 @@
 import json
+import os
+import tempfile
 from pathlib import Path
 import unittest
 import unittest.mock
@@ -21,6 +23,21 @@ class GuideManagerTest(unittest.TestCase):
                     expected = json.load(f)
                 result = self.manager.get_format(method)
                 self.assertEqual(result, expected)
+
+    def test_env_var_overrides_base_dir(self) -> None:
+        """``GUIDELINES_DIR`` should override the default directory."""
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "TEST_Guide.json"
+            data = {"steps": []}
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(data, f)
+            os.environ["GUIDELINES_DIR"] = tmp
+            try:
+                manager = GuideManager()
+                result = manager.get_format("TEST")
+                self.assertEqual(result, data)
+            finally:
+                del os.environ["GUIDELINES_DIR"]
 
     def test_load_guide(self) -> None:
         test_file = self.base_dir / "5N1K_Guide.json"

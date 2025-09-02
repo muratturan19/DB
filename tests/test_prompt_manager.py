@@ -1,3 +1,6 @@
+import json
+import os
+import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -20,6 +23,22 @@ class PromptManagerTextTest(unittest.TestCase):
                     expected = f.read()
                 result = self.manager.get_text_prompt(method)
                 self.assertEqual(result, expected)
+
+    def test_env_var_overrides_base_dir(self) -> None:
+        """``PROMPTS_DIR`` should override the default directory."""
+        with tempfile.TemporaryDirectory() as tmp:
+            txt_path = Path(tmp) / "X_Prompt.txt"
+            json_path = Path(tmp) / "X_Prompt.json"
+            txt_path.write_text("hello", encoding="utf-8")
+            with open(json_path, "w", encoding="utf-8") as f:
+                json.dump({"a": 1}, f)
+            os.environ["PROMPTS_DIR"] = tmp
+            try:
+                manager = PromptManager()
+                self.assertEqual(manager.get_text_prompt("X"), "hello")
+                self.assertEqual(manager.get_template("X"), {"a": 1})
+            finally:
+                del os.environ["PROMPTS_DIR"]
 
     def test_load_text_prompt(self) -> None:
         test_file = self.base_dir / "A3_Prompt.txt"
