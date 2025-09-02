@@ -22,6 +22,7 @@ from ReportGenerator import ReportGenerator
 from ComplaintSearch import ComplaintStore, ExcelClaimsSearcher, normalize_text
 from EightDScanner import EightDScanner
 from PromptManager import PromptManager
+import os
 
 REPORT_DIR = Path(__file__).resolve().parents[1] / "reports"
 REPORT_DIR.mkdir(parents=True, exist_ok=True)
@@ -63,6 +64,13 @@ reporter = ReportGenerator(_guide_manager)
 _store = ComplaintStore()
 _excel_searcher = ExcelClaimsSearcher()
 _scanner = EightDScanner(EIGHT_D_DIR)
+
+
+@app.get("/health")
+def health() -> Dict[str, bool]:
+    """Return service health information."""
+    missing = os.environ.get("CONFIG_MISSING") == "1"
+    return {"config_missing": missing}
 
 
 class AnalyzeBody(BaseModel):
@@ -169,12 +177,15 @@ def complaints(
         ]
     )
     if has_year_filter:
-        excel_results = _excel_searcher.search(
-            normalized,
-            year,
-            start_year=start_year,
-            end_year=end_year,
-        )
+        try:
+            excel_results = _excel_searcher.search(
+                normalized,
+                year,
+                start_year=start_year,
+                end_year=end_year,
+            )
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
     result = {"store": store_results, "excel": excel_results}
     logger.info("Complaints result: %s", result)
     return result
@@ -202,7 +213,10 @@ def options(field: str, request: Request) -> Dict[str, Any]:
     """Return unique option values for ``field`` from the Excel claims file."""
     logger.info("Options query params: %s", request.query_params)
     mapped_field = ALIAS_TO_HEADER.get(normalize_text(field), field)
-    result = {"values": _excel_searcher.unique_values(mapped_field)}
+    try:
+        result = {"values": _excel_searcher.unique_values(mapped_field)}
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
     logger.info("Options result: %s", result)
     return result
 

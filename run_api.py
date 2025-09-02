@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import os
+import logging
 from dotenv import load_dotenv
 import uvicorn
 
@@ -13,18 +14,14 @@ from api import app
 
 
 def _load_env() -> None:
-    """Load environment variables from ``.env`` file."""
+    """Load environment variables from ``ENV_FILE`` if provided."""
     env_file = os.environ.get("ENV_FILE")
     if env_file and Path(env_file).is_file():
         load_dotenv(env_file)
-        return
-    appdata = os.getenv("APPDATA")
-    if appdata:
-        default_env = Path(appdata) / "DB-App" / ".env"
-        if default_env.is_file():
-            load_dotenv(default_env)
-            return
-    load_dotenv()
+        os.environ["CONFIG_MISSING"] = "0"
+    else:  # pragma: no cover - config missing path logging
+        logging.error("Environment file missing; set ENV_FILE to a valid .env path")
+        os.environ["CONFIG_MISSING"] = "1"
 
 
 def main() -> None:

@@ -1,11 +1,11 @@
 import os
+import os
 import tempfile
 import unittest
 from datetime import datetime
 from unittest.mock import patch
 from pathlib import Path
 
-from ComplaintSearch import claims_excel
 from ComplaintSearch.claims_excel import ExcelClaimsSearcher
 from openpyxl import Workbook, load_workbook
 
@@ -115,7 +115,7 @@ class ExcelClaimsSearchTest(unittest.TestCase):
             customers = searcher.unique_values("customer")
             self.assertEqual(customers, ["ACME", "BETA"])
 
-    def test_env_default_path(self) -> None:
+    def test_env_path_used(self) -> None:
         """File path should come from ``COMPLAINTS_XLSX_PATH`` when not provided."""
         with tempfile.TemporaryDirectory() as tmpdir:
             file_path = os.path.join(tmpdir, "claims.xlsx")
@@ -125,39 +125,13 @@ class ExcelClaimsSearchTest(unittest.TestCase):
                 result = searcher.search({"customer": "ACME"}, year=2023)
                 self.assertEqual(len(result), 1)
 
-    def test_load_dotenv_called(self) -> None:
-        """``load_dotenv`` should be invoked when ``path`` is ``None``."""
-        with patch.dict("os.environ", {"COMPLAINTS_XLSX_PATH": "f"}):
-            with patch.object(claims_excel, "load_dotenv") as mock_load:
-                searcher = ExcelClaimsSearcher()
-                self.assertTrue(mock_load.called)
-                self.assertEqual(searcher.path, Path("f"))
-
-    def test_missing_file_logs_warning(self) -> None:
-        """A warning should be logged when the Excel file is absent."""
+    def test_missing_file_raises(self) -> None:
+        """A missing Excel file should raise ``FileNotFoundError``."""
         with tempfile.TemporaryDirectory() as tmpdir:
             file_path = os.path.join(tmpdir, "missing.xlsx")
             searcher = ExcelClaimsSearcher(file_path)
-            with self.assertLogs(level="WARNING") as log:
-                result = searcher.search({})
-            self.assertEqual(result, [])
-            self.assertIn("Excel file not found", "\n".join(log.output))
-
-    def test_bundled_file_outside_repo(self) -> None:
-        """Bundled Excel file should load when run outside the repo root."""
-        repo_root = Path(__file__).resolve().parents[1]
-        expected = repo_root / "CC" / "F160_Customer_Claims.xlsx"
-        with tempfile.TemporaryDirectory() as tmpdir:
-            cwd = os.getcwd()
-            try:
-                os.chdir(tmpdir)
-                with patch.dict("os.environ", {}, clear=True), \
-                        patch.object(claims_excel, "load_dotenv"):
-                    searcher = ExcelClaimsSearcher()
-            finally:
-                os.chdir(cwd)
-        self.assertEqual(searcher.path, expected)
-        self.assertTrue(len(searcher.search({})) > 0)
+            with self.assertRaises(FileNotFoundError):
+                searcher.search({})
 
     def test_year_range(self) -> None:
         """Records should be filterable by a start and end year."""
