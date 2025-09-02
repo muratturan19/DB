@@ -8,9 +8,6 @@ from datetime import datetime
 import os
 import logging
 
-from dotenv import load_dotenv
-from importlib import resources
-
 from difflib import SequenceMatcher
 from openpyxl import load_workbook
 
@@ -27,17 +24,22 @@ class ExcelClaimsSearcher:
         """Initialize with optional Excel file ``path``.
 
         When ``path`` is ``None``, ``COMPLAINTS_XLSX_PATH`` is read from the
-        ``.env`` file. If the variable is unset, the bundled
-        ``F160_Customer_Claims.xlsx`` inside the ``CC`` package is used.
+        environment. If the variable is unset or invalid, methods will raise
+        :class:`FileNotFoundError` when invoked.
         """
         if path is None:
-            load_dotenv()
             path = os.getenv("COMPLAINTS_XLSX_PATH")
-            if path is None:
-                path = resources.files("CC").joinpath(
-                    "F160_Customer_Claims.xlsx"
-                )
-        self.path = Path(path)
+        self.path = Path(path) if path else None
+
+    def _ensure_path(self) -> Path:
+        """Return the configured Excel path or raise if missing."""
+        if self.path is None:
+            raise FileNotFoundError("COMPLAINTS_XLSX_PATH is not set")
+        if not self.path.exists():
+            raise FileNotFoundError(
+                f"Complaints Excel not found at {self.path}",
+            )
+        return self.path
 
     def _load_headers(
         self, rows: Iterable[tuple[Any, ...]]
@@ -80,11 +82,8 @@ class ExcelClaimsSearcher:
         List[Dict[str, Any]]
             Matching rows as dictionaries keyed by normalized headers.
         """
-        if not self.path.exists():
-            logging.warning("Excel file not found at %s", self.path)
-            return []
-
-        wb = load_workbook(self.path, read_only=True)
+        path = self._ensure_path()
+        wb = load_workbook(path, read_only=True)
         ws = wb.active
         rows = ws.iter_rows(values_only=True)
         headers, indices = self._load_headers(rows)
@@ -158,10 +157,8 @@ class ExcelClaimsSearcher:
         List[str]
             Unique cell values as strings. Empty cells are ignored.
         """
-        if not self.path.exists():
-            return []
-
-        wb = load_workbook(self.path, read_only=True)
+        path = self._ensure_path()
+        wb = load_workbook(path, read_only=True)
         ws = wb.active
         rows = ws.iter_rows(values_only=True)
         headers, indices = self._load_headers(rows)
