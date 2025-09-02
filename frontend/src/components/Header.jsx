@@ -34,7 +34,7 @@ function Header({ toggleColorMode, mode }) {
             animation: 'fadeIn 1s ease-in-out'
           }}
         >
-          Plasma QR
+          DB Kalite Asistanı
         </Typography>
         <IconButton color="inherit" aria-label="help" sx={{ mx: 0.5, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}>
           <HelpOutlineIcon />

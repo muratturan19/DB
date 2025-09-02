@@ -25,7 +25,9 @@ from EightDScanner import EightDScanner
 REPORT_DIR = Path(__file__).resolve().parents[1] / "reports"
 REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
-app = FastAPI(title="Plasma QR API")
+EIGHT_D_DIR = Path(__file__).resolve().parents[1] / "eight_d_reports"
+
+app = FastAPI(title="DB Kalite Asistanı API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -58,7 +60,7 @@ reviewer = Review()
 reporter = ReportGenerator(_guide_manager)
 _store = ComplaintStore()
 _excel_searcher = ExcelClaimsSearcher()
-_scanner = EightDScanner(Path(__file__).resolve().parents[1] / "eight_d_reports")
+_scanner = EightDScanner(EIGHT_D_DIR)
 
 
 class AnalyzeBody(BaseModel):
@@ -114,10 +116,17 @@ def report(body: ReportBody) -> Dict[str, str]:
     """Generate PDF and Excel reports via ``ReportGenerator``."""
     logger.info("Report request body: %s", body.dict())
     try:
-        paths = reporter.generate(body.analysis, body.complaint_info, REPORT_DIR)
+        paths = reporter.generate(
+            body.analysis,
+            body.complaint_info,
+            REPORT_DIR,
+        )
     except Exception as exc:  # pragma: no cover - unexpected failure
         logger.exception("Report generation failed")
-        raise HTTPException(status_code=500, detail="Report generation failed") from exc
+        raise HTTPException(
+            status_code=500,
+            detail="Report generation failed",
+        ) from exc
     result = {
         "pdf": f"/reports/{Path(paths['pdf']).name}",
         "excel": f"/reports/{Path(paths['excel']).name}",
@@ -149,7 +158,15 @@ def complaints(
             val = val.strip()
         normalized[mapped] = val
     excel_results = []
-    if normalized or year is not None or start_year is not None or end_year is not None:
+    has_year_filter = any(
+        [
+            normalized,
+            year is not None,
+            start_year is not None,
+            end_year is not None,
+        ]
+    )
+    if has_year_filter:
         excel_results = _excel_searcher.search(
             normalized,
             year,

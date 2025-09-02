@@ -33,7 +33,7 @@ function Footer() {
         }}
       >
         <Typography variant="body2" sx={{ mb: isMobile ? 1 : 0 }}>
-          © {year} Plasma QR. All rights reserved.
+          © {year} DB Kalite Asistanı. All rights reserved.
         </Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
           <Link href="#" color="inherit" underline="hover">
