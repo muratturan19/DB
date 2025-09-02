@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import { Modal, Box, Typography, IconButton, TextField, Button } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
+import { API_BASE } from '../api'
 
 function PromptEditorModal({ open, onClose, method = 'A3' }) {
   const [content, setContent] = useState('')
 
   useEffect(() => {
     if (open) {
-      fetch(`/prompt/${method}`)
+      fetch(`${API_BASE}/prompt/${method}`)
         .then((res) => res.json())
         .then((data) => setContent(data.text))
     }
   }, [open, method])
 
   const handleSave = () => {
-    fetch(`/prompt/${method}`, {
+    fetch(`${API_BASE}/prompt/${method}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: content })
@@ -22,8 +23,8 @@ function PromptEditorModal({ open, onClose, method = 'A3' }) {
   }
 
   const handleReset = () => {
-    fetch(`/prompt/${method}/reset`, { method: 'POST' })
-      .then(() => fetch(`/prompt/${method}`))
+    fetch(`${API_BASE}/prompt/${method}/reset`, { method: 'POST' })
+      .then(() => fetch(`${API_BASE}/prompt/${method}`))
       .then((res) => res.json())
       .then((data) => setContent(data.text))
   }
