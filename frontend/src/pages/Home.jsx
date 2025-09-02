@@ -29,7 +29,7 @@ function Home() {
             sx={{ fontFamily: 'Poppins, Inter, sans-serif' }}
             color="text.primary"
           >
-            Plasma QR
+            DB Kalite Asistanı
           </Typography>
         </Box>
         <AnalysisForm instructionsBoxProps={{ mt: 3 }} />
