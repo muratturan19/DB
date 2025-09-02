@@ -1,5 +1,3 @@
-vi.mock('/logo.png', () => ({ default: '' }), { virtual: true })
-
 import { render, screen, fireEvent } from '@testing-library/react'
 import Header from '../components/Header'
 

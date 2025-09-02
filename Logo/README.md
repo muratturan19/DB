@@ -1,1 +1,1 @@
-Place your logo image as 'logo.png' in this directory.
+Place your logo image as 'fkt.png' in this directory.
