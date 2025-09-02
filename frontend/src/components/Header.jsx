@@ -9,8 +9,10 @@ import Brightness4Icon from '@mui/icons-material/Brightness4'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import SettingsIcon from '@mui/icons-material/Settings'
+import MenuBookIcon from '@mui/icons-material/MenuBook'
+import EditNoteIcon from '@mui/icons-material/EditNote'
 
-function Header({ toggleColorMode, mode }) {
+function Header({ toggleColorMode, mode, onOpenGuide, onOpenPrompt }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
@@ -36,6 +38,12 @@ function Header({ toggleColorMode, mode }) {
         >
           DB Kalite Asistanı
         </Typography>
+        <IconButton color="inherit" aria-label="guide" onClick={onOpenGuide} sx={{ mx: 0.5, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}>
+          <MenuBookIcon />
+        </IconButton>
+        <IconButton color="inherit" aria-label="prompt" onClick={onOpenPrompt} sx={{ mx: 0.5, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}>
+          <EditNoteIcon />
+        </IconButton>
         <IconButton color="inherit" aria-label="help" sx={{ mx: 0.5, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}>
           <HelpOutlineIcon />
         </IconButton>

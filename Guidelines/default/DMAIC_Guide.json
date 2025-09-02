@@ -1,0 +1,56 @@
+{
+  "method": "DMAIC",
+  "description": "DMAIC, süreç iyileştirme için kullanılan sistematik bir problem çözme metodudur. Tanımla, Ölç, Analiz Et, İyileştir ve Kontrol Et adımlarından oluşur.",
+  "fields": [
+    {
+      "id": "Define",
+      "title": "Tanımla (Define)",
+      "definition": "Problemi, süreci ve müşteri beklentilerini net olarak tanımlayın.",
+      "example_questions": [
+        "Müşteri kim ve beklentisi nedir?",
+        "Problemin kapsamı ve sınırları neler?",
+        "İyileştirilecek sürecin mevcut durumu nedir?"
+      ]
+    },
+    {
+      "id": "Measure",
+      "title": "Ölç (Measure)",
+      "definition": "Mevcut süreci ölçün ve problemin boyutunu sayısal verilerle ortaya koyun.",
+      "example_questions": [
+        "Hangi performans ölçütleri kullanılmalı?",
+        "Veri toplama planı oluşturuldu mu?",
+        "Mevcut performans ne düzeyde?"
+      ]
+    },
+    {
+      "id": "Analyze",
+      "title": "Analiz Et (Analyze)",
+      "definition": "Problemin kök nedenlerini analiz edin ve etkileyen değişkenleri belirleyin.",
+      "example_questions": [
+        "Mevcut süreç neden bu performansı gösteriyor?",
+        "Varyasyonun kaynakları neler?",
+        "Kritik girdiler nelerdir?"
+      ]
+    },
+    {
+      "id": "Improve",
+      "title": "İyileştir (Improve)",
+      "definition": "Kök nedenleri ortadan kaldırmak için çözümler üretin ve test edin.",
+      "example_questions": [
+        "Hangi iyileştirme fikirleri üretildi?",
+        "Deneme uygulamaları ne sonuç verdi?",
+        "Risk analizi yapıldı mı?"
+      ]
+    },
+    {
+      "id": "Control",
+      "title": "Kontrol Et (Control)",
+      "definition": "Uygulanan çözümlerin kalıcı olmasını sağlamak için kontroller kurun.",
+      "example_questions": [
+        "Yeni sürecin performansı nasıl izlenecek?",
+        "Standart prosedürler güncellendi mi?",
+        "Süreç sapmaları nasıl ele alınacak?"
+      ]
+    }
+  ]
+}

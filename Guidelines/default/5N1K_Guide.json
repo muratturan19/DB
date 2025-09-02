@@ -1,0 +1,66 @@
+{
+  "method": "5N1K (5W1H)",
+  "description": "Bir problemi tüm yönleriyle incelemek için kullanılan klasik sorgulama metodudur. Olayın bağlamını anlamak, kök nedenlere inmek ve çözüm sürecini başlatmak için kullanılır.",
+  "fields": [
+    {
+      "id": "What",
+      "title": "Ne? (What)",
+      "definition": "Problemin ne olduğunu açıkça tanımlayın. Hangi olay, durum veya hata ile karşılaşıldı?",
+      "example_questions": [
+        "Ne oldu?",
+        "Hangi ürün veya süreç etkilendi?",
+        "Hata tam olarak nasıl tanımlanabilir?"
+      ]
+    },
+    {
+      "id": "Where",
+      "title": "Nerede? (Where)",
+      "definition": "Problemin nerede meydana geldiğini belirtin. Fiziksel konum, hat veya dijital bir sistem olabilir.",
+      "example_questions": [
+        "Problem nerede meydana geldi?",
+        "Üretim hattının hangi bölümünde oluştu?",
+        "Hangi müşteri veya lokasyon etkilendi?"
+      ]
+    },
+    {
+      "id": "When",
+      "title": "Ne zaman? (When)",
+      "definition": "Problemin ne zaman ortaya çıktığını belirtin. Zaman aralığı, üretim tarihi, vardiya gibi detayları kapsar.",
+      "example_questions": [
+        "Problem ne zaman fark edildi?",
+        "İlk ne zaman oluştuğu biliniyor mu?",
+        "Belirli bir tarih veya vardiya ile ilişkili mi?"
+      ]
+    },
+    {
+      "id": "Who",
+      "title": "Kim? (Who)",
+      "definition": "Problemin kim tarafından fark edildiği ya da etkilediği kişileri tanımlayın.",
+      "example_questions": [
+        "Kim problemi ilk fark etti?",
+        "Kimler etkilenmiş olabilir?",
+        "Problemle ilgili çalışan, müşteri ya da tedarikçi var mı?"
+      ]
+    },
+    {
+      "id": "Why",
+      "title": "Neden? (Why)",
+      "definition": "Problemin ortaya çıkma sebepleri üzerine düşünün. Kök nedenlerin ipuçları burada aranır.",
+      "example_questions": [
+        "Neden bu problem oluştu?",
+        "Altta yatan nedenler neler olabilir?",
+        "Benzer problemler daha önce yaşandı mı?"
+      ]
+    },
+    {
+      "id": "How",
+      "title": "Nasıl? (How)",
+      "definition": "Problemin nasıl geliştiğini, sürecin nasıl işlediğini ve ne şekilde sonuçlandığını açıklayın.",
+      "example_questions": [
+        "Bu problem nasıl ortaya çıktı?",
+        "Olaylar hangi sırayla gelişti?",
+        "Şu an problem nasıl etkiler yaratıyor?"
+      ]
+    }
+  ]
+}

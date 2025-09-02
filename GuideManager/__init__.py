@@ -3,96 +3,13 @@
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 from typing import Any, Dict
 
 
 class GuideNotFoundError(FileNotFoundError):
     """Raised when the requested guide file cannot be found."""
-
-
-DEFAULT_8D_GUIDE: Dict[str, Any] = {
-    "method": "8D",
-    "description": (
-        "8D (Eight Disciplines) metodu, ürün ve süreç kaynaklı problemleri "
-        "sistematik şekilde çözmek için geliştirilmiş etkili bir problem "
-        "çözme tekniğidir. Özellikle otomotiv ve üretim sektöründe yaygındır."
-    ),
-    "steps": [
-        {
-            "step": "D1",
-            "title": "Ekip Oluşturma",
-            "detail": (
-                "Problemi analiz etmek ve çözmek için farklı disiplinlerden, "
-                "konuyla ilgili bilgi ve yetkinliğe sahip bir ekip oluşturulur. "
-                "Ekip üyeleri sorumluluklarına göre atanır."
-            ),
-        },
-        {
-            "step": "D2",
-            "title": "Problemin Tanımı",
-            "detail": (
-                "Problem açık, ölçülebilir ve objektif kriterlerle tanımlanır. "
-                "Müşteri şikayeti, ürün adı, tarih, yer, miktar gibi detaylara "
-                "yer verilir. 5N1K sorularıyla desteklenmesi önerilir."
-            ),
-        },
-        {
-            "step": "D3",
-            "title": "Geçici Önlemler",
-            "detail": (
-                "Problemin müşteriyi ya da süreci daha fazla etkilemesini önlemek "
-                "amacıyla geçici, hızlı çözümler uygulanır. Bu önlemlerin etkili "
-                "olduğu doğrulanmalıdır."
-            ),
-        },
-        {
-            "step": "D4",
-            "title": "Kök Neden Analizi",
-            "detail": (
-                "Problemin temel nedenleri araştırılır. Yüzeysel belirtiler değil, "
-                "problemi gerçekten yaratan neden(ler) tespit edilir. '5 Neden' "
-                "tekniği, balık kılçığı diyagramı gibi araçlar kullanılabilir."
-            ),
-        },
-        {
-            "step": "D5",
-            "title": "Kalıcı Çözüm Geliştirme",
-            "detail": (
-                "Kök nedenlere yönelik kalıcı çözüm önerileri oluşturulur. Bu "
-                "çözümlerin uygulanabilirliği, riskleri ve etkisi değerlendirilerek "
-                "en uygun çözüm seçilir."
-            ),
-        },
-        {
-            "step": "D6",
-            "title": "Kalıcı Çözümün Uygulanması",
-            "detail": (
-                "Seçilen kalıcı çözüm(ler) sahada uygulanır. Uygulama sonrası "
-                "doğrulama yapılır, gerekiyorsa düzeltici aksiyonlar alınır. "
-                "Etkinlik kontrolü bu aşamada önemlidir."
-            ),
-        },
-        {
-            "step": "D7",
-            "title": "Önleyici Faaliyetler",
-            "detail": (
-                "Benzer problemlerin başka ürün, proses ya da alanlarda "
-                "tekrarlanmaması için sistematik önleyici faaliyetler planlanır ve "
-                "uygulanır. Proaktif kalite anlayışı burada devrededir."
-            ),
-        },
-        {
-            "step": "D8",
-            "title": "Takdir ve Kapanış",
-            "detail": (
-                "Ekip üyeleri, çözüm sürecine katkılarından dolayı takdir edilir. "
-                "Tüm dokümantasyon tamamlanır ve süreç resmi olarak kapatılır. "
-                "Öğrenilen dersler paylaşılır."
-            ),
-        },
-    ],
-}
 
 
 class GuideManager:
@@ -115,14 +32,28 @@ class GuideManager:
         if method not in self._cache:
             base_dir = Path(__file__).resolve().parents[1] / "Guidelines"
             guide_path = base_dir / f"{method}_Guide.json"
-            try:
-                self._cache[method] = self.load_guide(str(guide_path))
-            except GuideNotFoundError:
-                if method == "8D":
-                    self._cache[method] = DEFAULT_8D_GUIDE
-                else:
-                    raise
+            self._cache[method] = self.load_guide(str(guide_path))
         return self._cache[method]
 
+    def save_guide(self, method: str, data: Dict[str, Any]) -> None:
+        """Persist ``data`` for ``method`` and update the cache."""
+        base_dir = Path(__file__).resolve().parents[1] / "Guidelines"
+        guide_path = base_dir / f"{method}_Guide.json"
+        with open(guide_path, "w", encoding="utf-8") as file:
+            json.dump(data, file, ensure_ascii=False, indent=2)
+        self._cache[method] = data
 
-__all__ = ["GuideManager", "GuideNotFoundError", "DEFAULT_8D_GUIDE"]
+    def reset_guide(self, method: str) -> None:
+        """Restore ``method`` guideline from the ``default`` directory."""
+        base_dir = Path(__file__).resolve().parents[1] / "Guidelines"
+        default_dir = base_dir / "default"
+        src = default_dir / f"{method}_Guide.json"
+        dst = base_dir / f"{method}_Guide.json"
+        if not src.exists():
+            raise GuideNotFoundError(str(src))
+        shutil.copy2(src, dst)
+        if method in self._cache:
+            del self._cache[method]
+
+
+__all__ = ["GuideManager", "GuideNotFoundError"]

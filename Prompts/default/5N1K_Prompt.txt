@@ -1,0 +1,27 @@
+Sen deneyimli bir kalite mühendisisin. Aşağıdaki müşteri şikayetine göre 5N1K analizine dayalı detaylı bir problem çözüm raporu oluştur.
+
+Müşteri Şikayeti: {{musteri_sikayeti}}  
+Parça Kodu: {{parca_kodu}}  
+Problem Açıklaması: {{problem_aciklamasi}}  
+
+Rapor şu başlıklara uygun olarak yazılmalıdır:
+
+1. Ne? (What)  
+[...]  
+
+2. Nerede? (Where)  
+[...]  
+
+3. Ne zaman? (When)  
+[...]  
+
+4. Kim? (Who)  
+[...]  
+
+5. Nasıl? (How)  
+[...]  
+
+6. Neden? (Why)  
+[...]  
+
+❗️Yalnızca yukarıdaki başlıklara uygun teknik içerik üret. Giriş paragrafı, metodoloji açıklaması ya da genel değerlendirme yazma. Her başlığı **sadece ilgili içerikle** doldur. Ekstra bilgi verme, raporu tek seferde üret.

@@ -3,9 +3,13 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import Home from './pages/Home'
 import Header from './components/Header'
+import GuidelineEditorModal from './components/GuidelineEditorModal'
+import PromptEditorModal from './components/PromptEditorModal'
 
 function App() {
   const [mode, setMode] = useState('light')
+  const [guideOpen, setGuideOpen] = useState(false)
+  const [promptOpen, setPromptOpen] = useState(false)
   const toggleColorMode = () => {
     setMode((prev) => (prev === 'light' ? 'dark' : 'light'))
   }
@@ -40,8 +44,15 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Header toggleColorMode={toggleColorMode} mode={mode} />
+      <Header
+        toggleColorMode={toggleColorMode}
+        mode={mode}
+        onOpenGuide={() => setGuideOpen(true)}
+        onOpenPrompt={() => setPromptOpen(true)}
+      />
       <Home />
+      <GuidelineEditorModal open={guideOpen} onClose={() => setGuideOpen(false)} />
+      <PromptEditorModal open={promptOpen} onClose={() => setPromptOpen(false)} />
     </ThemeProvider>
   )
 }

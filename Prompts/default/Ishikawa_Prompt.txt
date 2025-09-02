@@ -1,0 +1,27 @@
+Sen deneyimli bir kalite mühendisisin. Aşağıdaki müşteri şikayetine göre Ishikawa (Balık Kılçığı) metoduna uygun teknik bir analiz raporu hazırla.
+
+Müşteri Şikayeti: {{musteri_sikayeti}}  
+Parça Kodu: {{parca_kodu}}  
+Problem Açıklaması: {{problem_aciklamasi}}  
+
+Rapor şu başlıklara uygun olarak yazılmalıdır:
+
+1. İnsan (Man)  
+[...]  
+
+2. Makine (Machine)  
+[...]  
+
+3. Malzeme (Material)  
+[...]  
+
+4. Metot (Method)  
+[...]  
+
+5. Çevre (Environment)  
+[...]  
+
+6. Ölçüm (Measurement)  
+[...]  
+
+❗️Yalnızca yukarıdaki başlıklara uygun teknik içerik üret. Giriş paragrafı, metodoloji açıklaması ya da genel değerlendirme yazma. Her başlığı **sadece ilgili içerikle** doldur. Ekstra bilgi verme, raporu tek seferde üret.
