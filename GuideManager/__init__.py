@@ -31,14 +31,14 @@ class GuideManager:
     def _base_dir(self) -> Path:
         """Return the directory containing guideline files.
 
-        ``GUIDELINES_DIR`` must point to the user-configurable guidelines
-        directory. Packaged defaults are used only as a fallback when the
-        requested file does not exist in that location.
+        ``GUIDELINES_DIR`` can override the default location. When the
+        environment variable is absent, the packaged ``Guidelines`` directory
+        is used so the application functions with sensible defaults.
         """
         env_dir = os.environ.get("GUIDELINES_DIR")
-        if not env_dir:
-            raise RuntimeError("GUIDELINES_DIR missing")
-        return Path(env_dir)
+        if env_dir:
+            return Path(env_dir)
+        return Path(__file__).resolve().parents[1] / "Guidelines"
 
     def get_format(self, method: str) -> Dict[str, Any]:
         """Return the guide dictionary for the given method."""
