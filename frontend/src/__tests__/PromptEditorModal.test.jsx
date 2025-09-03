@@ -17,3 +17,9 @@ test('loads prompt text on open', async () => {
   )
   await waitFor(() => expect(screen.getByRole('textbox')).toHaveValue(text))
 })
+
+test('shows error on fetch failure', async () => {
+  vi.spyOn(global, 'fetch').mockRejectedValueOnce(new Error('oops'))
+  render(<PromptEditorModal open onClose={() => {}} />)
+  await waitFor(() => expect(screen.getByText('oops')).toBeInTheDocument())
+})

@@ -42,3 +42,9 @@ test('allows switching between guideline methods', async () => {
     expect(global.fetch).toHaveBeenCalledWith(`${API_BASE}/guide/A3`)
   )
 })
+
+test('shows error on fetch failure', async () => {
+  vi.spyOn(global, 'fetch').mockRejectedValueOnce(new Error('boom'))
+  render(<GuidelineEditorModal open onClose={() => {}} />)
+  await waitFor(() => expect(screen.getByText('boom')).toBeInTheDocument())
+})
