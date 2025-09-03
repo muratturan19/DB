@@ -14,8 +14,13 @@ class ReportGeneratorTest(unittest.TestCase):
     """Tests for ReportGenerator.generate."""
 
     def setUp(self) -> None:
+        base_dir = Path(__file__).resolve().parents[1] / "Guidelines"
+        os.environ["GUIDELINES_DIR"] = str(base_dir)
         self.manager = GuideManager()
         self.generator = ReportGenerator(self.manager)
+
+    def tearDown(self) -> None:
+        del os.environ["GUIDELINES_DIR"]
 
     def test_generate_creates_files(self) -> None:
         analysis = {"Step1": {"response": "foo"}, "Step2": {"response": "bar"}}

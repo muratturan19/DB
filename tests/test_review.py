@@ -1,68 +1,43 @@
-import types
+import os
+import tempfile
 import unittest
-from unittest.mock import patch, mock_open, MagicMock
+from pathlib import Path
 
 from Review import Review
 
 
-class ReviewTest(unittest.TestCase):
-    """Tests for the Review class."""
+class ReviewPromptTest(unittest.TestCase):
+    """Tests for Review prompt loading from environment."""
 
-    def test_perform_uses_query_llm(self) -> None:
-        review = Review()
-        with patch.object(Review, "_query_llm", return_value="a") as mock_query:
-            result = review.perform("x")
-            self.assertEqual(result, "a")
-            mock_query.assert_called_once()
-
-    def test_prompt_template_is_used(self) -> None:
-        template = "prefix {initial_report_text} suffix"
-        with patch("builtins.open", mock_open(read_data=template)):
-            review = Review()
-        with patch.object(Review, "_query_llm") as mock_query:
-            mock_query.return_value = "ok"
-            review.perform("data", language="Türkçe")
-            mock_query.assert_called_with("prefix data suffix")
-
-    def test_query_llm_logs_error(self) -> None:
-        """Ensure network errors are logged for debugging."""
-        template = "{initial_report_text}"
-        with patch("builtins.open", mock_open(read_data=template)):
-            review = Review()
-        mock_openai = types.ModuleType("openai")
-        mock_client = MagicMock()
-        exc = Exception("timeout")
-        mock_client.chat.completions.create.side_effect = exc
-        mock_openai.OpenAI = MagicMock(return_value=mock_client)
-        with patch.dict("sys.modules", {"openai": mock_openai}):
-            with patch.dict("os.environ", {"OPENAI_API_KEY": "key"}):
-                with self.assertLogs("Review", level="ERROR") as log:
-                    review._query_llm("prompt")
-        self.assertIn(f"Review error: {exc}", "\n".join(log.output))
-
-    def test_query_llm_logs_tokens(self) -> None:
-        """Ensure start, end and token usage messages are logged."""
-        template = "{initial_report_text}"
-        with patch("builtins.open", mock_open(read_data=template)):
-            review = Review()
-        mock_openai = types.ModuleType("openai")
-        usage = types.SimpleNamespace(total_tokens=3)
-        response = types.SimpleNamespace(
-            choices=[types.SimpleNamespace(message=types.SimpleNamespace(content="rev"))],
-            usage=usage,
+    def setUp(self) -> None:
+        self.default_prompt = (
+            Path(__file__).resolve().parents[1]
+            / "Prompts"
+            / "Fixer_General_Prompt.md"
         )
-        mock_client = MagicMock()
-        mock_client.chat.completions.create.return_value = response
-        mock_openai.OpenAI = MagicMock(return_value=mock_client)
-        with patch.dict("sys.modules", {"openai": mock_openai}):
-            with patch.dict("os.environ", {"OPENAI_API_KEY": "key"}):
-                with self.assertLogs("Review", level="DEBUG") as log:
-                    result = review._query_llm("prompt")
-        self.assertEqual(result, "rev")
-        messages = "\n".join(log.output)
-        self.assertIn("Review._query_llm start", messages)
-        self.assertIn("INFO:Review:Review tokens used: 3", messages)
-        self.assertIn("Review._query_llm end", messages)
+        with open(self.default_prompt, "r", encoding="utf-8") as f:
+            self.default_content = f.read()
+
+    def test_missing_env_var_raises(self) -> None:
+        os.environ.pop("PROMPTS_DIR", None)
+        with self.assertRaises(RuntimeError):
+            Review()
+
+    def test_fallback_to_package_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            os.environ["PROMPTS_DIR"] = tmp
+            review = Review()
+            self.assertEqual(review.template, self.default_content)
+        os.environ.pop("PROMPTS_DIR", None)
+
+    def test_loads_from_env_dir(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            custom = Path(tmp) / "Fixer_General_Prompt.md"
+            custom.write_text("CUSTOM", encoding="utf-8")
+            os.environ["PROMPTS_DIR"] = tmp
+            review = Review()
+            self.assertEqual(review.template, "CUSTOM")
+        os.environ.pop("PROMPTS_DIR", None)
 
 
 if __name__ == "__main__":

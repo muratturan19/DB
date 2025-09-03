@@ -12,8 +12,12 @@ class GuideManagerTest(unittest.TestCase):
     """Tests for GuideManager guide loading."""
 
     def setUp(self) -> None:
-        self.manager = GuideManager()
         self.base_dir = Path(__file__).resolve().parents[1] / "Guidelines"
+        os.environ["GUIDELINES_DIR"] = str(self.base_dir)
+        self.manager = GuideManager()
+
+    def tearDown(self) -> None:
+        os.environ.pop("GUIDELINES_DIR", None)
 
     def test_get_format(self) -> None:
         for method in ["5N1K", "8D", "A3", "DMAIC", "Ishikawa"]:
@@ -24,20 +28,23 @@ class GuideManagerTest(unittest.TestCase):
                 result = self.manager.get_format(method)
                 self.assertEqual(result, expected)
 
-    def test_env_var_overrides_base_dir(self) -> None:
-        """``GUIDELINES_DIR`` should override the default directory."""
+    def test_missing_env_var_raises(self) -> None:
+        """``GUIDELINES_DIR`` must be set."""
+        del os.environ["GUIDELINES_DIR"]
+        with self.assertRaises(RuntimeError):
+            GuideManager().get_format("8D")
+
+    def test_fallback_to_package_files(self) -> None:
+        """Missing files in ``GUIDELINES_DIR`` fall back to packaged ones."""
         with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp) / "TEST_Guide.json"
-            data = {"steps": []}
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(data, f)
             os.environ["GUIDELINES_DIR"] = tmp
-            try:
-                manager = GuideManager()
-                result = manager.get_format("TEST")
-                self.assertEqual(result, data)
-            finally:
-                del os.environ["GUIDELINES_DIR"]
+            manager = GuideManager()
+            expected_path = self.base_dir / "A3_Guide.json"
+            with open(expected_path, "r", encoding="utf-8") as f:
+                expected = json.load(f)
+            result = manager.get_format("A3")
+            self.assertEqual(result, expected)
+        os.environ["GUIDELINES_DIR"] = str(self.base_dir)
 
     def test_load_guide(self) -> None:
         test_file = self.base_dir / "5N1K_Guide.json"

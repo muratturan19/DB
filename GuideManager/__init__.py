@@ -31,19 +31,23 @@ class GuideManager:
     def _base_dir(self) -> Path:
         """Return the directory containing guideline files.
 
-        ``GUIDELINES_DIR`` can override the default location, allowing packaged
-        applications to use user-specific guideline paths.
+        ``GUIDELINES_DIR`` must point to the user-configurable guidelines
+        directory. Packaged defaults are used only as a fallback when the
+        requested file does not exist in that location.
         """
         env_dir = os.environ.get("GUIDELINES_DIR")
-        if env_dir:
-            return Path(env_dir)
-        return Path(__file__).resolve().parents[1] / "Guidelines"
+        if not env_dir:
+            raise RuntimeError("GUIDELINES_DIR missing")
+        return Path(env_dir)
 
     def get_format(self, method: str) -> Dict[str, Any]:
         """Return the guide dictionary for the given method."""
         if method not in self._cache:
             base_dir = self._base_dir()
             guide_path = base_dir / f"{method}_Guide.json"
+            if not guide_path.exists():
+                package_dir = Path(__file__).resolve().parents[1] / "Guidelines"
+                guide_path = package_dir / f"{method}_Guide.json"
             self._cache[method] = self.load_guide(str(guide_path))
         return self._cache[method]
 

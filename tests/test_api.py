@@ -1,3 +1,4 @@
+import os
 import unittest
 from unittest.mock import patch
 
@@ -6,6 +7,11 @@ import tempfile
 from pathlib import Path
 from ComplaintSearch import ComplaintStore
 from LLMAnalyzer import OpenAIError
+
+base_prompts = Path(__file__).resolve().parents[1] / "Prompts"
+base_guides = Path(__file__).resolve().parents[1] / "Guidelines"
+os.environ.setdefault("PROMPTS_DIR", str(base_prompts))
+os.environ.setdefault("GUIDELINES_DIR", str(base_guides))
 
 import api
 
