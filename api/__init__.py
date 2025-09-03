@@ -133,10 +133,7 @@ def report(body: ReportBody) -> Dict[str, str]:
         )
     except Exception as exc:  # pragma: no cover - unexpected failure
         logger.exception("Report generation failed")
-        raise HTTPException(
-            status_code=500,
-            detail="Report generation failed",
-        ) from exc
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
     result = {
         "pdf": f"/reports/{Path(paths['pdf']).name}",
         "excel": f"/reports/{Path(paths['excel']).name}",

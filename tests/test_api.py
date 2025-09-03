@@ -2,6 +2,8 @@ import os
 import unittest
 from unittest.mock import patch
 
+# flake8: noqa
+
 from fastapi.testclient import TestClient
 import tempfile
 from pathlib import Path
@@ -13,7 +15,7 @@ base_guides = Path(__file__).resolve().parents[1] / "Guidelines"
 os.environ.setdefault("PROMPTS_DIR", str(base_prompts))
 os.environ.setdefault("GUIDELINES_DIR", str(base_guides))
 
-import api
+import api  # noqa: E402
 
 
 class APITest(unittest.TestCase):
@@ -41,7 +43,9 @@ class APITest(unittest.TestCase):
             "directives": "",
             "language": "Türkçe",
         }
-        with patch.object(api.analyzer, "analyze", return_value={"ok": 1}) as mock_analyze:
+        with patch.object(
+            api.analyzer, "analyze", return_value={"ok": 1}
+        ) as mock_analyze:
             response = self.client.post("/analyze", json=payload)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"ok": 1})
@@ -106,7 +110,7 @@ class APITest(unittest.TestCase):
             with self.assertLogs("api", level="ERROR") as cm:
                 response = self.client.post("/report", json=body)
         self.assertEqual(response.status_code, 500)
-        self.assertEqual(response.json()["detail"], "Report generation failed")
+        self.assertEqual(response.json()["detail"], "boom")
         self.assertIn("Report generation failed", "\n".join(cm.output))
 
     def test_reports_static_mount(self) -> None:
@@ -121,36 +125,48 @@ class APITest(unittest.TestCase):
 
     def test_complaints_endpoint(self) -> None:
         params = {"keyword": "k", "customer": "c"}
-        with patch.object(api._store, "search", return_value=[{"id": 1}]) as mock_store, \
-             patch.object(api._excel_searcher, "search", return_value=[{"id": 2}]) as mock_excel:
+        with patch.object(
+            api._store, "search", return_value=[{"id": 1}]
+        ) as mock_store, patch.object(
+            api._excel_searcher, "search", return_value=[{"id": 2}]
+        ) as mock_excel:
             response = self.client.get("/complaints", params=params)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"store": [{"id": 1}], "excel": [{"id": 2}]})
         mock_store.assert_called_with("k")
-        mock_excel.assert_called_with({"Müşteri Adı": "c"}, None, start_year=None, end_year=None)
+        mock_excel.assert_called_with(
+            {"Müşteri Adı": "c"}, None, start_year=None, end_year=None
+        )
 
     def test_complaints_endpoint_year_range(self) -> None:
         params = {"customer": "c", "start_year": 2020, "end_year": 2022}
         with patch.object(api._excel_searcher, "search", return_value=[]) as mock_excel:
             response = self.client.get("/complaints", params=params)
         self.assertEqual(response.status_code, 200)
-        mock_excel.assert_called_with({"Müşteri Adı": "c"}, None, start_year=2020, end_year=2022)
+        mock_excel.assert_called_with(
+            {"Müşteri Adı": "c"}, None, start_year=2020, end_year=2022
+        )
 
     def test_complaints_extra_filters_forwarded(self) -> None:
         params = {"foo": "bar", "customer": "c"}
-        with patch.object(api._store, "search") as mock_store, \
-             patch.object(api._excel_searcher, "search", return_value=[]) as mock_excel:
+        with patch.object(api._store, "search") as mock_store, patch.object(
+            api._excel_searcher, "search", return_value=[]
+        ) as mock_excel:
             response = self.client.get("/complaints", params=params)
         self.assertEqual(response.status_code, 200)
         mock_store.assert_not_called()
-        mock_excel.assert_called_with({"foo": "bar", "Müşteri Adı": "c"}, None, start_year=None, end_year=None)
+        mock_excel.assert_called_with(
+            {"foo": "bar", "Müşteri Adı": "c"}, None, start_year=None, end_year=None
+        )
 
     def test_complaints_alias_turkish_key(self) -> None:
         params = {"Müşteri Adı": "c"}
         with patch.object(api._excel_searcher, "search", return_value=[]) as mock_excel:
             response = self.client.get("/complaints", params=params)
         self.assertEqual(response.status_code, 200)
-        mock_excel.assert_called_with({"Müşteri Adı": "c"}, None, start_year=None, end_year=None)
+        mock_excel.assert_called_with(
+            {"Müşteri Adı": "c"}, None, start_year=None, end_year=None
+        )
 
     def test_options_endpoint(self) -> None:
         with patch.object(
@@ -193,7 +209,6 @@ class APITest(unittest.TestCase):
         self.assertEqual(response.json(), {"status": "ok"})
         mock_add.assert_called_with(body)
 
-
     def test_review_endpoint_error(self) -> None:
         body = {"text": "t", "context": {}}
         with patch.object(api.reviewer, "perform", side_effect=Exception("boom")):
@@ -202,7 +217,9 @@ class APITest(unittest.TestCase):
         self.assertIn("boom", response.json()["detail"])
 
     def test_complaints_endpoint_error(self) -> None:
-        with patch.object(api._excel_searcher, "search", side_effect=ValueError("fail")):
+        with patch.object(
+            api._excel_searcher, "search", side_effect=ValueError("fail")
+        ):
             response = self.client.get("/complaints", params={"customer": "c"})
         self.assertEqual(response.status_code, 500)
 
@@ -210,12 +227,18 @@ class APITest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             store = ComplaintStore(Path(tmpdir) / "c.json")
             with patch.object(api, "_store", store):
-                body = {"complaint": "n", "customer": "AC", "subject": "s", "part_code": "p"}
+                body = {
+                    "complaint": "n",
+                    "customer": "AC",
+                    "subject": "s",
+                    "part_code": "p",
+                }
                 add_resp = self.client.post("/complaints", json=body)
                 self.assertEqual(add_resp.status_code, 200)
                 resp = self.client.get("/complaints", params={"keyword": "n"})
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.json()["store"], [body])
+
 
 if __name__ == "__main__":
     unittest.main()
