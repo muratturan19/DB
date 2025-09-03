@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import { Modal, Box, Typography, IconButton, TextField, Button } from '@mui/material'
+import {
+  Modal,
+  Box,
+  Typography,
+  IconButton,
+  TextField,
+  Button,
+  MenuItem
+} from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { API_BASE } from '../api'
 
-function GuidelineEditorModal({ open, onClose, method = '8D' }) {
+function GuidelineEditorModal({ open, onClose, initialMethod = '8D' }) {
+  const [method, setMethod] = useState(initialMethod)
   const [content, setContent] = useState('')
 
   useEffect(() => {
@@ -52,8 +61,21 @@ function GuidelineEditorModal({ open, onClose, method = '8D' }) {
           <CloseIcon />
         </IconButton>
         <Typography id="guideline-editor-title" variant="h6" sx={{ mb: 2 }}>
-          {method} Guideline
+          Guideline Editor
         </Typography>
+        <TextField
+          select
+          label="Method"
+          value={method}
+          onChange={(e) => setMethod(e.target.value)}
+          sx={{ mb: 2 }}
+        >
+          {['5N1K', '8D', 'A3', 'DMAIC', 'Ishikawa'].map((m) => (
+            <MenuItem key={m} value={m}>
+              {m}
+            </MenuItem>
+          ))}
+        </TextField>
         <TextField
           multiline
           fullWidth
@@ -61,6 +83,7 @@ function GuidelineEditorModal({ open, onClose, method = '8D' }) {
           maxRows={25}
           value={content}
           onChange={(e) => setContent(e.target.value)}
+          inputProps={{ 'aria-label': 'guideline-content' }}
           sx={{ mb: 2, flexGrow: 1, overflowY: 'auto' }}
         />
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
