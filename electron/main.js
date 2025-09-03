@@ -51,9 +51,26 @@ app.whenReady().then(() => {
 
   const backendExe = path.join(process.resourcesPath, 'backend', 'backend.exe');
   backendProcess = spawn(backendExe, [], {
-    env: { ...process.env, ENV_FILE: envPath },
-    stdio: 'ignore',
+    env: {
+      ...process.env,
+      ENV_FILE: envPath,
+      PROMPTS_DIR: path.join(appDataRoot, 'prompts'),
+    },
+    stdio: ['ignore', 'pipe', 'pipe'], // Hata loglarını görmek için
     windowsHide: true,
+  });
+
+  // Hata loglarını yakala
+  backendProcess.stderr.on('data', (data) => {
+    console.error('Backend error:', data.toString());
+  });
+
+  backendProcess.stdout.on('data', (data) => {
+    console.log('Backend output:', data.toString());
+  });
+
+  backendProcess.on('exit', (code) => {
+    console.log('Backend exited with code:', code);
   });
 
   ipcMain.handle('guidelines:open', () => shell.openPath(userGuidelines));
