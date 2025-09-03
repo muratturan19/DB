@@ -28,7 +28,26 @@ def main() -> None:
     """Start the API server."""
     configure_logging()
     _load_env()
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+    # PyInstaller ile paketlenmiş uygulamalar için uvicorn konfigürasyonu
+    import sys
+
+    # stdout/stderr'ın None olması durumunda dummy objeler oluştur
+    if sys.stdout is None:
+        import io
+        sys.stdout = io.StringIO()
+    if sys.stderr is None:
+        import io
+        sys.stderr = io.StringIO()
+
+    # Uvicorn'u logging sorunlarını önleyecek şekilde başlat
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=8000,
+        log_config=None,  # Uvicorn'un kendi logging config'ini devre dışı bırak
+        access_log=False
+    )
 
 
 if __name__ == "__main__":
