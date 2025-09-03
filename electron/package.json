@@ -1,18 +1,22 @@
 {
   "name": "db-kalite-asistani-electron",
   "version": "1.0.0",
+  "description": "Desktop packaging for DB quality assistant",
+  "author": "Mira",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "prep": "rm -rf ui && mkdir -p ui && cp -r ../frontend/dist/* ui/ && mkdir -p bundles/backend && cp ../bundles/backend/backend.exe bundles/backend/backend.exe",
+    "prep": "rimraf ui && shx mkdir -p ui && shx cp -r ../frontend/dist/* ui/ && shx mkdir -p bundles/backend && shx cp ../bundles/backend/backend.exe bundles/backend/backend.exe",
     "dist": "electron-builder -w"
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
-    "electron": "^30.0.0"
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
-    "electron-builder": "^24.6.0"
+    "electron": "^30.0.0",
+    "electron-builder": "^24.6.0",
+    "rimraf": "^5.0.5",
+    "shx": "^0.3.4"
   },
   "build": {
     "asar": true,
