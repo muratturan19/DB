@@ -6,7 +6,8 @@ import {
   IconButton,
   TextField,
   Button,
-  MenuItem
+  MenuItem,
+  Alert
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { API_BASE } from '../api'
@@ -14,12 +15,15 @@ import { API_BASE } from '../api'
 function GuidelineEditorModal({ open, onClose, initialMethod = '8D' }) {
   const [method, setMethod] = useState(initialMethod)
   const [content, setContent] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => {
     if (open) {
+      setError('')
       fetch(`${API_BASE}/guide/${method}`)
         .then((res) => res.json())
         .then((data) => setContent(JSON.stringify(data, null, 2)))
+        .catch((err) => setError(err.message))
     }
   }, [open, method])
 
@@ -36,6 +40,7 @@ function GuidelineEditorModal({ open, onClose, initialMethod = '8D' }) {
       .then(() => fetch(`${API_BASE}/guide/${method}`))
       .then((res) => res.json())
       .then((data) => setContent(JSON.stringify(data, null, 2)))
+      .catch((err) => setError(err.message))
   }
 
   return (
@@ -63,6 +68,11 @@ function GuidelineEditorModal({ open, onClose, initialMethod = '8D' }) {
         <Typography id="guideline-editor-title" variant="h6" sx={{ mb: 2 }}>
           Guideline Editor
         </Typography>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
         <TextField
           select
           label="Method"

@@ -1,16 +1,27 @@
 import React, { useEffect, useState } from 'react'
-import { Modal, Box, Typography, IconButton, TextField, Button } from '@mui/material'
+import {
+  Modal,
+  Box,
+  Typography,
+  IconButton,
+  TextField,
+  Button,
+  Alert
+} from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { API_BASE } from '../api'
 
 function PromptEditorModal({ open, onClose, method = 'A3' }) {
   const [content, setContent] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => {
     if (open) {
+      setError('')
       fetch(`${API_BASE}/prompt/${method}`)
         .then((res) => res.json())
         .then((data) => setContent(data.text))
+        .catch((err) => setError(err.message))
     }
   }, [open, method])
 
@@ -27,6 +38,7 @@ function PromptEditorModal({ open, onClose, method = 'A3' }) {
       .then(() => fetch(`${API_BASE}/prompt/${method}`))
       .then((res) => res.json())
       .then((data) => setContent(data.text))
+      .catch((err) => setError(err.message))
   }
 
   return (
@@ -54,6 +66,11 @@ function PromptEditorModal({ open, onClose, method = 'A3' }) {
         <Typography id="prompt-editor-title" variant="h6" sx={{ mb: 2 }}>
           {method} Prompt
         </Typography>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
         <TextField
           multiline
           fullWidth
