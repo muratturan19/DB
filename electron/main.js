@@ -35,6 +35,10 @@ function createWindow() {
 
   const indexPath = path.join(__dirname, 'ui', 'index.html');
   mainWindow.loadFile(indexPath);
+
+  // Developer console'u aç (geçici debug için)
+  mainWindow.webContents.openDevTools();
+
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
   });
