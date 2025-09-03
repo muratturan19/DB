@@ -32,8 +32,8 @@ function createWindow() {
     },
   });
 
-  const indexPath = path.join(process.resourcesPath, 'ui', 'index.html');
-  mainWindow.loadURL(`file://${indexPath}`);
+  const indexPath = path.join(__dirname, 'ui', 'index.html');
+  mainWindow.loadFile(indexPath);
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
   });
