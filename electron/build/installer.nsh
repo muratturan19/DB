@@ -35,8 +35,8 @@ Function SelectComplaints
 FunctionEnd
 
 Function .onInstSuccess
-    nsDialogs::GetText $ApiKeyControl $ApiKey
-    nsDialogs::GetText $ComplaintsControl $ComplaintsPath
+    ${NSD_GetText} $ApiKeyControl $ApiKey
+    ${NSD_GetText} $ComplaintsControl $ComplaintsPath
     StrCpy $0 "$APPDATA\DB-App"
     CreateDirectory $0
     FileOpen $1 "$0\.env" w
