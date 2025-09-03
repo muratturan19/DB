@@ -1,48 +1,68 @@
 !include "MUI2.nsh"
 !include "nsDialogs.nsh"
+!include "FileFunc.nsh"
 
-Var ApiKey
-Var ComplaintsPath
 Var ApiKeyControl
 Var ComplaintsControl
 
-Page custom GetInputs
+!insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_DIRECTORY
+Page custom InputPageCreate InputPageLeave
 !insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_LANGUAGE "Turkish"
 
-Function GetInputs
-    nsDialogs::Create 1018
-    Pop $0
+Function InputPageCreate
+  nsDialogs::Create 1018
+  Pop $0
 
-    ${NSD_CreateLabel} 0 0 100% 12u "OpenAI API Key"
-    Pop $1
-    ${NSD_CreateText} 0 12u 100% 12u ""
-    Pop $ApiKeyControl
+  ${NSD_CreateLabel} 0 0 100% 12u "OpenAI API Key:"
+  Pop $1
+  ${NSD_CreateText} 0 12u 100% 12u ""
+  Pop $ApiKeyControl
 
-    ${NSD_CreateLabel} 0 30u 100% 12u "Müşteri Şikayetleri Excel Yolu"
-    Pop $2
-    ${NSD_CreateText} 0 42u 75% 12u ""
-    Pop $ComplaintsControl
-    ${NSD_CreateBrowseButton} 80% 42u 20% 12u "Seç"
-    Pop $3
-    ${NSD_OnClick} $3 SelectComplaints
+  ${NSD_CreateLabel} 0 36u 100% 12u "Müşteri Şikayetleri Excel dosyası:"
+  Pop $1
+  ${NSD_CreateText} 0 48u 75% 12u ""
+  Pop $ComplaintsControl
+  ${NSD_CreateBrowseButton} 80% 48u 20% 12u "Gözat..."
+  Pop $2
+  ${NSD_OnClick} $2 SelectComplaints
 
-    nsDialogs::Show
+  nsDialogs::Show
 FunctionEnd
 
 Function SelectComplaints
-    nsDialogs::SelectFileDialog open "" "" "" $ComplaintsControl
+  nsDialogs::SelectFileDialog open "" "Excel Files|*.xlsx;*.xls|All Files|*.*"
+  Pop $0
+  StrCmp $0 "" done
+  ${NSD_SetText} $ComplaintsControl $0
+done:
 FunctionEnd
 
-Function .onInstSuccess
-    ${NSD_GetText} $ApiKeyControl $ApiKey
-    ${NSD_GetText} $ComplaintsControl $ComplaintsPath
-    StrCpy $0 "$APPDATA\DB-App"
-    CreateDirectory $0
-    FileOpen $1 "$0\.env" w
-    FileWrite $1 "OPENAI_API_KEY=$ApiKey$\r$\n"
-    FileWrite $1 "COMPLAINTS_XLSX_PATH=$ComplaintsPath$\r$\n"
-    FileWrite $1 "GUIDELINES_DIR=$APPDATA\\DB-App\\guidelines$\r$\n"
-    FileWrite $1 "PROMPTS_DIR=$APPDATA\\DB-App\\prompts$\r$\n"
-    FileClose $1
+Function InputPageLeave
+  ${NSD_GetText} $ApiKeyControl      $R0
+  ${NSD_GetText} $ComplaintsControl  $R1
+
+  StrLen $R2 $R0
+  IntCmp $R2 10 0 invalid_api 0
+  IfFileExists "$R1" 0 invalid_xlsx
+
+  StrCpy $R3 "$APPDATA\DB-App"
+  CreateDirectory "$R3"
+  FileOpen  $R4 "$R3\.env" w
+  FileWrite $R4 "OPENAI_API_KEY=$R0$\r$\n"
+  FileWrite $R4 "COMPLAINTS_XLSX_PATH=$R1$\r$\n"
+  FileWrite $R4 "GUIDELINES_DIR=$R3\guidelines$\r$\n"
+  FileWrite $R4 "PROMPTS_DIR=$R3\prompts$\r$\n"
+  FileClose $R4
+  Return
+
+invalid_api:
+  MessageBox MB_ICONEXCLAMATION "Geçersiz OpenAI API Key."
+  Abort
+
+invalid_xlsx:
+  MessageBox MB_ICONEXCLAMATION "Geçersiz Excel yolu (.xlsx/.xls seçin)."
+  Abort
 FunctionEnd
 
