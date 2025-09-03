@@ -39,7 +39,9 @@ class ReviewPromptTest(unittest.TestCase):
 
     def test_builtin_prompt_used_when_resource_missing(self) -> None:
         os.environ.pop("PROMPTS_DIR", None)
-        with patch("Review.pkg_resources.files", side_effect=FileNotFoundError):
+        with patch("sys.frozen", True, create=True), patch(
+            "sys._MEIPASS", "/nonexistent", create=True
+        ), patch("os.path.exists", return_value=False):
             review = Review()
             self.assertEqual(review.template, self.default_content)
 

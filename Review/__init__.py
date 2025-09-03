@@ -5,8 +5,6 @@ from __future__ import annotations
 import os
 import logging
 from pathlib import Path
-from importlib import resources as pkg_resources
-import Prompts
 
 
 FALLBACK_PROMPT = (
@@ -33,41 +31,35 @@ class Review:
         self.logger = logging.getLogger(__name__)
 
         if template_path is None:
+            # Önce PROMPTS_DIR environment variable'ını kontrol et
             base_dir = os.environ.get("PROMPTS_DIR")
             if base_dir:
                 primary = Path(base_dir) / "Fixer_General_Prompt.md"
                 if primary.exists():
                     template_path = str(primary)
 
+            # PROMPTS_DIR'de bulunamadıysa, bundle içinde ara
+            if template_path is None:
+                import sys
+                if getattr(sys, 'frozen', False):
+                    try:
+                        bundle_dir = sys._MEIPASS
+                        prompt_file = os.path.join(
+                            bundle_dir, "Prompts", "Fixer_General_Prompt.md"
+                        )
+                        if os.path.exists(prompt_file):
+                            template_path = prompt_file
+                    except Exception:
+                        pass
+
         if template_path is not None:
             with open(template_path, "r", encoding="utf-8") as file:
                 self.template = file.read()
         else:
-            # PyInstaller bundle içinde dosya arama
-            try:
-                import sys
-
-                if getattr(sys, "frozen", False):
-                    # Bundle içindeyse
-                    bundle_dir = sys._MEIPASS
-                    prompt_file = os.path.join(
-                        bundle_dir, "Prompts", "Fixer_General_Prompt.md"
-                    )
-                    with open(prompt_file, "r", encoding="utf-8") as file:
-                        self.template = file.read()
-                else:
-                    # Normal Python çalıştırılıyorsa pkg_resources kullan
-                    resource = (
-                        pkg_resources.files(Prompts)
-                        .joinpath("Fixer_General_Prompt.md")
-                        .read_text(encoding="utf-8")
-                    )
-                    self.template = resource
-            except (FileNotFoundError, ModuleNotFoundError):
-                self.logger.warning(
-                    "Prompt template not found; using built-in default",
-                )
-                self.template = FALLBACK_PROMPT
+            self.logger.warning(
+                "Prompt template not found; using built-in default"
+            )
+            self.template = FALLBACK_PROMPT
 
     def _query_llm(self, prompt: str) -> str:
         """Return the LLM response for the given prompt."""
