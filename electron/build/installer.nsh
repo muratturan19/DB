@@ -9,7 +9,6 @@ Var ComplaintsControl
 !insertmacro MUI_PAGE_DIRECTORY
 Page custom InputPageCreate InputPageLeave
 !insertmacro MUI_PAGE_INSTFILES
-!insertmacro MUI_LANGUAGE "Turkish"
 
 Function InputPageCreate
   nsDialogs::Create 1018
