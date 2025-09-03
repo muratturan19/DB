@@ -37,22 +37,35 @@ class Review:
             if base_dir:
                 primary = Path(base_dir) / "Fixer_General_Prompt.md"
                 if primary.exists():
-                    template_path = primary
+                    template_path = str(primary)
 
         if template_path is not None:
             with open(template_path, "r", encoding="utf-8") as file:
                 self.template = file.read()
-        else:  # pragma: no cover - executed only when file is bundled
+        else:
+            # PyInstaller bundle içinde dosya arama
             try:
-                resource = (
-                    pkg_resources.files(Prompts)
-                    .joinpath("Fixer_General_Prompt.md")
-                    .read_text(encoding="utf-8")
-                )
-                self.template = resource
+                import sys
+
+                if getattr(sys, "frozen", False):
+                    # Bundle içindeyse
+                    bundle_dir = sys._MEIPASS
+                    prompt_file = os.path.join(
+                        bundle_dir, "Prompts", "Fixer_General_Prompt.md"
+                    )
+                    with open(prompt_file, "r", encoding="utf-8") as file:
+                        self.template = file.read()
+                else:
+                    # Normal Python çalıştırılıyorsa pkg_resources kullan
+                    resource = (
+                        pkg_resources.files(Prompts)
+                        .joinpath("Fixer_General_Prompt.md")
+                        .read_text(encoding="utf-8")
+                    )
+                    self.template = resource
             except (FileNotFoundError, ModuleNotFoundError):
                 self.logger.warning(
-                    "Prompt template not found; using built-in default"
+                    "Prompt template not found; using built-in default",
                 )
                 self.template = FALLBACK_PROMPT
 
