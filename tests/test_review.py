@@ -2,6 +2,7 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from Review import Review
 
@@ -35,6 +36,12 @@ class ReviewPromptTest(unittest.TestCase):
             review = Review()
             self.assertEqual(review.template, "CUSTOM")
         os.environ.pop("PROMPTS_DIR", None)
+
+    def test_builtin_prompt_used_when_resource_missing(self) -> None:
+        os.environ.pop("PROMPTS_DIR", None)
+        with patch("Review.pkg_resources.files", side_effect=FileNotFoundError):
+            review = Review()
+            self.assertEqual(review.template, self.default_content)
 
 
 if __name__ == "__main__":
