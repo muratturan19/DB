@@ -18,12 +18,12 @@ class ReviewPromptTest(unittest.TestCase):
         with open(self.default_prompt, "r", encoding="utf-8") as f:
             self.default_content = f.read()
 
-    def test_missing_env_var_raises(self) -> None:
+    def test_missing_env_var_uses_default(self) -> None:
         os.environ.pop("PROMPTS_DIR", None)
-        with self.assertRaises(RuntimeError):
-            Review()
+        review = Review()
+        self.assertEqual(review.template, self.default_content)
 
-    def test_fallback_to_package_files(self) -> None:
+    def test_env_without_prompt_uses_default(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             os.environ["PROMPTS_DIR"] = tmp
             review = Review()
