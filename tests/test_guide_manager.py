@@ -28,11 +28,15 @@ class GuideManagerTest(unittest.TestCase):
                 result = self.manager.get_format(method)
                 self.assertEqual(result, expected)
 
-    def test_missing_env_var_raises(self) -> None:
-        """``GUIDELINES_DIR`` must be set."""
-        del os.environ["GUIDELINES_DIR"]
-        with self.assertRaises(RuntimeError):
-            GuideManager().get_format("8D")
+    def test_env_var_optional(self) -> None:
+        """Manager should use packaged guides when ``GUIDELINES_DIR`` is unset."""
+        os.environ.pop("GUIDELINES_DIR", None)
+        manager = GuideManager()
+        expected_path = self.base_dir / "8D_Guide.json"
+        with open(expected_path, "r", encoding="utf-8") as f:
+            expected = json.load(f)
+        result = manager.get_format("8D")
+        self.assertEqual(result, expected)
 
     def test_fallback_to_package_files(self) -> None:
         """Missing files in ``GUIDELINES_DIR`` fall back to packaged ones."""
