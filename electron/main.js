@@ -33,7 +33,7 @@ function createWindow() {
   });
 
   const indexPath = path.join(process.resourcesPath, 'ui', 'index.html');
-  mainWindow.loadFile(indexPath);
+  mainWindow.loadURL(`file://${indexPath}`);
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
   });
@@ -51,6 +51,7 @@ app.whenReady().then(() => {
   const backendExe = path.join(process.resourcesPath, 'backend', 'backend.exe');
   backendProcess = spawn(backendExe, [], {
     env: { ...process.env, ENV_FILE: envPath },
+    stdio: 'ignore',
     windowsHide: true,
   });
 
