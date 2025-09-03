@@ -8,7 +8,6 @@ Var ComplaintsControl
 
 Page custom GetInputs
 !insertmacro MUI_PAGE_INSTFILES
-!insertmacro MUI_LANGUAGE "Turkish"
 
 Function GetInputs
     nsDialogs::Create 1018
