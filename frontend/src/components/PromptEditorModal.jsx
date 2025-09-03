@@ -31,15 +31,39 @@ function PromptEditorModal({ open, onClose, method = 'A3' }) {
 
   return (
     <Modal open={open} onClose={onClose} aria-labelledby="prompt-editor-title">
-      <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', boxShadow: 24, p: 3, borderRadius: 2, width: '80%', maxWidth: 700 }}>
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          bgcolor: 'background.paper',
+          boxShadow: 24,
+          p: 3,
+          borderRadius: 2,
+          width: '80%',
+          maxWidth: 700,
+          maxHeight: '90vh',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
         <IconButton aria-label="close" onClick={onClose} sx={{ position: 'absolute', top: 8, right: 8 }}>
           <CloseIcon />
         </IconButton>
         <Typography id="prompt-editor-title" variant="h6" sx={{ mb: 2 }}>
           {method} Prompt
         </Typography>
-        <TextField multiline fullWidth minRows={12} value={content} onChange={(e) => setContent(e.target.value)} sx={{ mb: 2 }} />
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <TextField
+          multiline
+          fullWidth
+          minRows={12}
+          maxRows={25}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          sx={{ mb: 2, flexGrow: 1, overflowY: 'auto' }}
+        />
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
           <Button onClick={handleReset} color="secondary" sx={{ mr: 1 }}>
             Reset
           </Button>
