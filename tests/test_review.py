@@ -10,11 +10,8 @@ class ReviewPromptTest(unittest.TestCase):
     """Tests for Review prompt loading from environment."""
 
     def setUp(self) -> None:
-        self.default_prompt = (
-            Path(__file__).resolve().parents[1]
-            / "Prompts"
-            / "Fixer_General_Prompt.md"
-        )
+        root = Path(__file__).resolve().parents[1]
+        self.default_prompt = root / "Prompts" / "Fixer_General_Prompt.md"
         with open(self.default_prompt, "r", encoding="utf-8") as f:
             self.default_content = f.read()
 

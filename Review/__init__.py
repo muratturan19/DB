@@ -6,6 +6,7 @@ import os
 import logging
 from pathlib import Path
 from importlib import resources as pkg_resources
+import Prompts
 
 
 class ReviewLLMError(RuntimeError):
@@ -15,7 +16,9 @@ class ReviewLLMError(RuntimeError):
 class Review:
     """Reviews generated reports or analysis results."""
 
-    def __init__(self, model: str | None = None, template_path: str | None = None) -> None:
+    def __init__(
+        self, model: str | None = None, template_path: str | None = None
+    ) -> None:
         """Initialize with optional LLM model name and prompt template."""
         if model is None:
             model = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
@@ -35,7 +38,7 @@ class Review:
         else:  # pragma: no cover - executed only when file is bundled
             try:
                 resource = (
-                    pkg_resources.files("Prompts")
+                    pkg_resources.files(Prompts)
                     .joinpath("Fixer_General_Prompt.md")
                     .read_text(encoding="utf-8")
                 )
@@ -61,14 +64,20 @@ class Review:
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
             )
-            tokens = getattr(getattr(response, "usage", None), "total_tokens", None)
+            tokens = getattr(
+                getattr(response, "usage", None),
+                "total_tokens",
+                None,
+            )
             if tokens is not None:
                 self.logger.info("Review tokens used: %s", tokens)
-            result = response.choices[0].message.content.strip()
+            content = response.choices[0].message.content
+            result = content.strip()
             self.logger.debug("Review._query_llm end")
             return result
         except Exception as exc:  # pragma: no cover - network issues
-            if "invalid" in str(exc).lower() or "incorrect" in str(exc).lower():
+            message = str(exc).lower()
+            if "invalid" in message or "incorrect" in message:
                 raise ReviewLLMError("Invalid OpenAI API key") from exc
             self.logger.error("Review error: %s", exc)
             self.logger.debug("Review._query_llm end")
