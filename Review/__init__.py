@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import logging
 from pathlib import Path
+from importlib import resources as pkg_resources
 
 
 class ReviewLLMError(RuntimeError):
@@ -27,11 +28,20 @@ class Review:
                 primary = Path(base_dir) / "Fixer_General_Prompt.md"
                 if primary.exists():
                     template_path = primary
-            if template_path is None:  # pragma: no cover - fallback only when missing
-                package_dir = Path(__file__).resolve().parents[1] / "Prompts"
-                template_path = package_dir / "Fixer_General_Prompt.md"
-        with open(template_path, "r", encoding="utf-8") as file:
-            self.template = file.read()
+
+        if template_path is not None:
+            with open(template_path, "r", encoding="utf-8") as file:
+                self.template = file.read()
+        else:  # pragma: no cover - executed only when file is bundled
+            try:
+                resource = (
+                    pkg_resources.files("Prompts")
+                    .joinpath("Fixer_General_Prompt.md")
+                    .read_text(encoding="utf-8")
+                )
+                self.template = resource
+            except (FileNotFoundError, ModuleNotFoundError) as exc:
+                raise ReviewLLMError("Prompt template not found") from exc
 
     def _query_llm(self, prompt: str) -> str:
         """Return the LLM response for the given prompt."""
