@@ -22,8 +22,15 @@ class Review:
         self.logger = logging.getLogger(__name__)
 
         if template_path is None:
-            base_dir = Path(__file__).resolve().parents[1] / "Prompts"
-            template_path = base_dir / "Fixer_General_Prompt.md"
+            base_dir = os.environ.get("PROMPTS_DIR")
+            if not base_dir:
+                raise RuntimeError("PROMPTS_DIR missing")
+            primary = Path(base_dir) / "Fixer_General_Prompt.md"
+            if primary.exists():
+                template_path = primary
+            else:  # pragma: no cover - fallback only when missing
+                package_dir = Path(__file__).resolve().parents[1] / "Prompts"
+                template_path = package_dir / "Fixer_General_Prompt.md"
         with open(template_path, "r", encoding="utf-8") as file:
             self.template = file.read()
 

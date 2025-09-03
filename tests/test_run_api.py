@@ -3,6 +3,7 @@ import os
 import tempfile
 import unittest
 from unittest.mock import patch
+from pathlib import Path
 
 
 class RunAPITest(unittest.TestCase):
@@ -10,11 +11,21 @@ class RunAPITest(unittest.TestCase):
 
     def test_main_with_env_file(self) -> None:
         """``main`` should load dotenv when ``ENV_FILE`` exists."""
+        base_prompts = Path(__file__).resolve().parents[1] / "Prompts"
+        base_guides = Path(__file__).resolve().parents[1] / "Guidelines"
         with tempfile.TemporaryDirectory() as tmpdir:
             env_path = os.path.join(tmpdir, ".env")
             with open(env_path, "w", encoding="utf-8") as fh:
                 fh.write("OPENAI_API_KEY=key")
-            with patch.dict(os.environ, {"ENV_FILE": env_path}, clear=True):
+            with patch.dict(
+                os.environ,
+                {
+                    "ENV_FILE": env_path,
+                    "PROMPTS_DIR": str(base_prompts),
+                    "GUIDELINES_DIR": str(base_guides),
+                },
+                clear=True,
+            ):
                 module = importlib.import_module("run_api")
                 with patch.object(module, "uvicorn") as mock_uvicorn, \
                         patch.object(module, "configure_logging") as mock_conf, \
@@ -29,7 +40,16 @@ class RunAPITest(unittest.TestCase):
 
     def test_main_without_env_file(self) -> None:
         """``main`` should not load dotenv when ``ENV_FILE`` is missing."""
-        with patch.dict(os.environ, {}, clear=True):
+        base_prompts = Path(__file__).resolve().parents[1] / "Prompts"
+        base_guides = Path(__file__).resolve().parents[1] / "Guidelines"
+        with patch.dict(
+            os.environ,
+            {
+                "PROMPTS_DIR": str(base_prompts),
+                "GUIDELINES_DIR": str(base_guides),
+            },
+            clear=True,
+        ):
             module = importlib.import_module("run_api")
             with patch.object(module, "uvicorn") as mock_uvicorn, \
                     patch.object(module, "configure_logging") as mock_conf, \

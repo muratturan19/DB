@@ -2,6 +2,12 @@ import logging
 import os
 import unittest
 from unittest.mock import patch
+from pathlib import Path
+
+base_prompts = Path(__file__).resolve().parents[1] / "Prompts"
+base_guides = Path(__file__).resolve().parents[1] / "Guidelines"
+os.environ.setdefault("PROMPTS_DIR", str(base_prompts))
+os.environ.setdefault("GUIDELINES_DIR", str(base_guides))
 
 from api.logging_config import configure_logging
 
