@@ -9,6 +9,13 @@ from importlib import resources as pkg_resources
 import Prompts
 
 
+FALLBACK_PROMPT = (
+    "Review the following report for clarity and correctness.\n"
+    "Return the improved text only in {language}.\n\n"
+    "{initial_report_text}\n"
+)
+
+
 class ReviewLLMError(RuntimeError):
     """Raised when the review LLM cannot be used."""
 
@@ -43,8 +50,11 @@ class Review:
                     .read_text(encoding="utf-8")
                 )
                 self.template = resource
-            except (FileNotFoundError, ModuleNotFoundError) as exc:
-                raise ReviewLLMError("Prompt template not found") from exc
+            except (FileNotFoundError, ModuleNotFoundError):
+                self.logger.warning(
+                    "Prompt template not found; using built-in default"
+                )
+                self.template = FALLBACK_PROMPT
 
     def _query_llm(self, prompt: str) -> str:
         """Return the LLM response for the given prompt."""
