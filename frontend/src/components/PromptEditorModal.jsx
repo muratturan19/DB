@@ -6,12 +6,14 @@ import {
   IconButton,
   TextField,
   Button,
-  Alert
+  Alert,
+  MenuItem
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { API_BASE } from '../api'
 
-function PromptEditorModal({ open, onClose, method = 'A3' }) {
+function PromptEditorModal({ open, onClose, initialMethod = 'A3' }) {
+  const [method, setMethod] = useState(initialMethod)
   const [content, setContent] = useState('')
   const [error, setError] = useState('')
 
@@ -64,8 +66,21 @@ function PromptEditorModal({ open, onClose, method = 'A3' }) {
           <CloseIcon />
         </IconButton>
         <Typography id="prompt-editor-title" variant="h6" sx={{ mb: 2 }}>
-          {method} Prompt
+          Prompt Editor
         </Typography>
+        <TextField
+          select
+          label="Method"
+          value={method}
+          onChange={(e) => setMethod(e.target.value)}
+          sx={{ mb: 2 }}
+        >
+          {['5N1K', '8D', 'A3', 'DMAIC', 'Ishikawa'].map((m) => (
+            <MenuItem key={m} value={m}>
+              {m}
+            </MenuItem>
+          ))}
+        </TextField>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
