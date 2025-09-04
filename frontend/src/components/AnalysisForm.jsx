@@ -169,6 +169,16 @@ function AnalysisForm({
     fetchOptions('subject', setSubjectOptions);
     fetchOptions('part_code', setPartCodeOptions);
   }, []);
+
+  const extractError = async (res) => {
+    const text = await res.text();
+    try {
+      const data = JSON.parse(text);
+      return data.detail || data.message || text;
+    } catch {
+      return text;
+    }
+  };
   const handleAnalyze = async () => {
     setError('');
     setLoading(true);
@@ -184,7 +194,7 @@ function AnalysisForm({
     try {
       const guideRes = await fetch(`${API_BASE}/guide/${method}`);
       if (!guideRes.ok) {
-        setError(await guideRes.text());
+        setError(await extractError(guideRes));
         return;
       }
       const guideline = await guideRes.json();
@@ -195,7 +205,7 @@ function AnalysisForm({
         body: JSON.stringify({ details, guideline, directives, language })
       });
       if (!analyzeRes.ok) {
-        setError(await analyzeRes.text());
+        setError(await extractError(analyzeRes));
         return;
       }
       const analysis = await analyzeRes.json();
@@ -221,7 +231,7 @@ function AnalysisForm({
         })
       });
       if (!reviewRes.ok) {
-        setError(await reviewRes.text());
+        setError(await extractError(reviewRes));
         return;
       }
       const reviewData = await reviewRes.json();
@@ -242,8 +252,7 @@ function AnalysisForm({
       });
 
       if (!reportRes.ok) {
-        const errorText = await reportRes.text();
-        setError(errorText);
+        setError(await extractError(reportRes));
         setReportPaths(null);
         return;
       } else {
@@ -309,7 +318,7 @@ function AnalysisForm({
       setLoading(true);
       const res = await fetch(`${API_BASE}/scan_8d`, { method: 'POST' });
       if (!res.ok) {
-        setError(await res.text());
+        setError(await extractError(res));
       }
     } catch (err) {
       console.error(err);
