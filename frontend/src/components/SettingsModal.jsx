@@ -18,12 +18,16 @@ function SettingsModal({ open, onClose }) {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0]
     if (file) {
-      setExcelPath(file.path || '')
+      const path = file.path || e.target.value || file.name || ''
+      setExcelPath(path)
+    } else {
+      setExcelPath('')
     }
   }
 
   const handleSave = async () => {
-    if (!apiKey.startsWith('sk-') || !excelPath) {
+    const trimmedKey = apiKey.trim()
+    if (!trimmedKey.startsWith('sk-') || !excelPath) {
       setSnack({ open: true, message: 'Geçersiz bilgi', severity: 'error' })
       return
     }
@@ -31,7 +35,7 @@ function SettingsModal({ open, onClose }) {
       const res = await fetch(`${API_BASE}/setup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ apiKey, excelPath })
+        body: JSON.stringify({ apiKey: trimmedKey, excelPath })
       })
       if (!res.ok) throw new Error('failed')
       setSnack({ open: true, message: 'Ayarlar kaydedildi', severity: 'success' })
