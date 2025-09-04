@@ -14,6 +14,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from dotenv import set_key
 
 from GuideManager import GuideManager
 from LLMAnalyzer import LLMAnalyzer
@@ -40,6 +41,27 @@ app.mount("/reports", StaticFiles(directory=str(REPORT_DIR)), name="reports")
 
 logger = logging.getLogger(__name__)
 
+# ---------------------------------------------------------------------------
+# Environment configuration
+
+
+class SetupBody(BaseModel):
+    apiKey: str
+    excelPath: str
+
+
+@app.post("/setup")
+def setup(body: SetupBody) -> Dict[str, str]:
+    """Persist configuration values to the ``.env`` file."""
+    env_file = os.environ.get("ENV_FILE", ".env")
+    env_path = Path(env_file)
+    env_path.touch(exist_ok=True)
+    set_key(str(env_path), "OPENAI_API_KEY", body.apiKey)
+    set_key(str(env_path), "COMPLAINTS_XLSX_PATH", body.excelPath)
+    return {"status": "ok"}
+
+
+# ---------------------------------------------------------------------------
 # Map common query aliases to Excel header names
 ALIAS_TO_HEADER = {
     normalize_text("customer"): "Müşteri Adı",

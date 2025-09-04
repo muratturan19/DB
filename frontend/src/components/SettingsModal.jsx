@@ -13,7 +13,7 @@ import { API_BASE } from '../api'
 function SettingsModal({ open, onClose }) {
   const [apiKey, setApiKey] = useState('')
   const [excelPath, setExcelPath] = useState('')
-  const [snackOpen, setSnackOpen] = useState(false)
+  const [snack, setSnack] = useState({ open: false, message: '', severity: 'success' })
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0]
@@ -23,14 +23,22 @@ function SettingsModal({ open, onClose }) {
   }
 
   const handleSave = async () => {
-    if (!apiKey.startsWith('sk-') || !excelPath) return
-    await fetch(`${API_BASE}/setup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ apiKey, excelPath })
-    })
-    setSnackOpen(true)
-    onClose()
+    if (!apiKey.startsWith('sk-') || !excelPath) {
+      setSnack({ open: true, message: 'Geçersiz bilgi', severity: 'error' })
+      return
+    }
+    try {
+      const res = await fetch(`${API_BASE}/setup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey, excelPath })
+      })
+      if (!res.ok) throw new Error('failed')
+      setSnack({ open: true, message: 'Ayarlar kaydedildi', severity: 'success' })
+      onClose()
+    } catch {
+      setSnack({ open: true, message: 'Ayarlar kaydedilemedi', severity: 'error' })
+    }
   }
 
   return (
@@ -68,12 +76,12 @@ function SettingsModal({ open, onClose }) {
         </DialogActions>
       </Dialog>
       <Snackbar
-        open={snackOpen}
+        open={snack.open}
         autoHideDuration={3000}
-        onClose={() => setSnackOpen(false)}
+        onClose={() => setSnack((s) => ({ ...s, open: false }))}
       >
-        <Alert severity="success" sx={{ width: '100%' }}>
-          Ayarlar kaydedildi
+        <Alert severity={snack.severity} sx={{ width: '100%' }}>
+          {snack.message}
         </Alert>
       </Snackbar>
     </>

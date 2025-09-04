@@ -27,4 +27,20 @@ test('posts settings and closes', async () => {
     )
   )
   await waitFor(() => expect(onClose).toHaveBeenCalled())
+  expect(await screen.findByText('Ayarlar kaydedildi')).toBeInTheDocument()
+})
+
+test('shows error on failure', async () => {
+  const onClose = vi.fn()
+  vi.spyOn(global, 'fetch').mockRejectedValue(new Error('network'))
+  render(<SettingsModal open onClose={onClose} />)
+  fireEvent.change(screen.getByLabelText(/openai api key/i), {
+    target: { value: 'sk-test' }
+  })
+  const file = new File(['data'], 'test.xlsx')
+  Object.defineProperty(file, 'path', { value: '/path/test.xlsx' })
+  fireEvent.change(screen.getByTestId('excel-input'), { target: { files: [file] } })
+  fireEvent.click(screen.getByText('Kaydet'))
+  await screen.findByText('Ayarlar kaydedilemedi')
+  expect(onClose).not.toHaveBeenCalled()
 })
