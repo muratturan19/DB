@@ -5,11 +5,13 @@ import Home from './pages/Home'
 import Header from './components/Header'
 import GuidelineEditorModal from './components/GuidelineEditorModal'
 import PromptEditorModal from './components/PromptEditorModal'
+import SettingsModal from './components/SettingsModal'
 
 function App() {
   const [mode, setMode] = useState('light')
   const [guideOpen, setGuideOpen] = useState(false)
   const [promptOpen, setPromptOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const toggleColorMode = () => {
     setMode((prev) => (prev === 'light' ? 'dark' : 'light'))
   }
@@ -44,17 +46,19 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Header
-        toggleColorMode={toggleColorMode}
-        mode={mode}
-        onOpenGuide={() => setGuideOpen(true)}
-        onOpenPrompt={() => setPromptOpen(true)}
-      />
-      <Home />
-      <GuidelineEditorModal open={guideOpen} onClose={() => setGuideOpen(false)} />
-      <PromptEditorModal open={promptOpen} onClose={() => setPromptOpen(false)} />
-    </ThemeProvider>
-  )
-}
+        <Header
+          toggleColorMode={toggleColorMode}
+          mode={mode}
+          onOpenGuide={() => setGuideOpen(true)}
+          onOpenPrompt={() => setPromptOpen(true)}
+          onOpenSettings={() => setSettingsOpen(true)}
+        />
+        <Home />
+        <GuidelineEditorModal open={guideOpen} onClose={() => setGuideOpen(false)} />
+        <PromptEditorModal open={promptOpen} onClose={() => setPromptOpen(false)} />
+        <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      </ThemeProvider>
+    )
+  }
 
 export default App
