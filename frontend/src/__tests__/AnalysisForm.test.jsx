@@ -384,6 +384,33 @@ test('hides report links when report request fails', async () => {
   expect(screen.queryByTestId('pdf-link')).toBeNull()
 })
 
+test('shows detail message from JSON error response', async () => {
+  fetch
+    .mockResolvedValueOnce({ ok: true, json: async () => ({ values: [] }) })
+    .mockResolvedValueOnce({ ok: true, json: async () => ({ values: [] }) })
+    .mockResolvedValueOnce({ ok: true, json: async () => ({ values: [] }) })
+    .mockResolvedValueOnce({ ok: true, json: async () => ({ fields: [] }) })
+    .mockResolvedValueOnce({ ok: true, json: async () => ({ analysisText: 'a' }) })
+    .mockResolvedValueOnce({ ok: true, json: async () => ({ result: 'r' }) })
+    .mockResolvedValueOnce({
+      ok: false,
+      text: async () => JSON.stringify({ detail: 'Report generation failed' })
+    })
+
+  render(<AnalysisForm initialMethod="8D" />)
+  await waitFor(() => expect(fetch).toHaveBeenCalledTimes(3))
+
+  fireEvent.change(screen.getByLabelText('Şikayet (Complaint)'), {
+    target: { value: 'c' }
+  })
+  fireEvent.click(screen.getByRole('button', { name: 'ANALİZ ET' }))
+
+  await waitFor(() => expect(fetch).toHaveBeenCalledTimes(7))
+  expect(
+    await screen.findByText('Report generation failed')
+  ).toBeInTheDocument()
+})
+
 test('shows alert when analyze request rejects', async () => {
   fetch
     .mockResolvedValueOnce({ ok: true, json: async () => ({ values: [] }) })
