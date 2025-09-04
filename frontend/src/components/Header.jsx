@@ -5,25 +5,16 @@ import IconButton from '@mui/material/IconButton'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import Box from '@mui/material/Box'
 import { useTheme } from '@mui/material/styles'
-import { useState } from 'react'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import SettingsIcon from '@mui/icons-material/Settings'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import EditNoteIcon from '@mui/icons-material/EditNote'
 
-function Header({ toggleColorMode, mode, onOpenGuide, onOpenPrompt }) {
+function Header({ toggleColorMode, mode, onOpenGuide, onOpenPrompt, onOpenSettings }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const [anchorEl, setAnchorEl] = useState(null)
-  const open = Boolean(anchorEl)
-  const handleOpen = (e) => setAnchorEl(e.currentTarget)
-  const handleClose = () => setAnchorEl(null)
-
-  const api = window.api
 
   return (
     <AppBar
@@ -56,16 +47,14 @@ function Header({ toggleColorMode, mode, onOpenGuide, onOpenPrompt }) {
         <IconButton color="inherit" aria-label="help" sx={{ mx: 0.5, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}>
           <HelpOutlineIcon />
         </IconButton>
-        <IconButton color="inherit" aria-label="settings" onClick={handleOpen} sx={{ mx: 0.5, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}>
+        <IconButton
+          color="inherit"
+          aria-label="settings"
+          onClick={onOpenSettings}
+          sx={{ mx: 0.5, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}
+        >
           <SettingsIcon />
         </IconButton>
-        <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-          <MenuItem onClick={() => { api.openGuidelines(); handleClose() }}>Guidelines klasörünü aç</MenuItem>
-          <MenuItem onClick={() => { api.resetGuidelines(); handleClose() }}>Guidelines'ı sıfırla</MenuItem>
-          <MenuItem onClick={() => { api.openPrompts(); handleClose() }}>Prompts klasörünü aç</MenuItem>
-          <MenuItem onClick={() => { api.resetPrompts(); handleClose() }}>Prompts'u sıfırla</MenuItem>
-          <MenuItem onClick={() => { api.openConfig(); handleClose() }}>Konfigürasyon klasörünü aç (.env)</MenuItem>
-        </Menu>
         <IconButton color="inherit" onClick={toggleColorMode} aria-label="toggle color mode" sx={{ mx: 0.5, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}>
           {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
         </IconButton>
